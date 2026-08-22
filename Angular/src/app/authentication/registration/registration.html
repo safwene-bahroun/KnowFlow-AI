@@ -1,0 +1,488 @@
+<div class="auth-container">
+
+  <div class="back-btn-wrapper">
+    <button routerLink="/Home"><-- Back to Home</button>
+  </div>
+
+  <div class="auth-card">
+
+    <h1>Create Account</h1>
+
+    <p class="subtitle">
+      Join KnowFlow AI
+    </p>
+
+
+    <!-- ========== STEP INDICATOR ========== -->
+
+    <div class="step-indicator">
+
+      <div
+        class="step"
+        [class.active]="currentStep === 1"
+        [class.completed]="currentStep > 1"
+      >
+        <span class="step-num">
+          <span *ngIf="currentStep <= 1">1</span>
+          <span *ngIf="currentStep > 1">&#10003;</span>
+        </span>
+        <span class="step-label">Personal</span>
+      </div>
+
+      <div
+        class="step-line"
+        [class.active]="currentStep > 1"
+      ></div>
+
+      <div
+        class="step"
+        [class.active]="currentStep === 2"
+      >
+        <span class="step-num">2</span>
+        <span class="step-label">Professional</span>
+      </div>
+
+    </div>
+
+
+    <!-- ========== FORM ========== -->
+
+    <form
+      [formGroup]="registerForm"
+      (ngSubmit)="register()"
+    >
+
+
+      <!-- ============================================
+           STEP 1 : PERSONAL INFO
+           ============================================ -->
+
+      <div
+        class="step-content"
+        [class.hidden]="currentStep !== 1"
+      >
+
+        <!-- NAME -->
+
+        <div class="form-group">
+
+          <label>Name</label>
+
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="First name"
+          >
+
+          <small
+            class="error"
+            *ngIf="
+              registerForm.get('name')?.touched &&
+              registerForm.get('name')?.invalid
+            "
+          >
+            Name is required (min 2 characters).
+          </small>
+
+        </div>
+
+
+        <!-- FAMILY NAME -->
+
+        <div class="form-group">
+
+          <label>Family name</label>
+
+          <input
+            type="text"
+            formControlName="familyName"
+            placeholder="Family name"
+          >
+
+          <small
+            class="error"
+            *ngIf="
+              registerForm.get('familyName')?.touched &&
+              registerForm.get('familyName')?.invalid
+            "
+          >
+            Family name is required (min 2 characters).
+          </small>
+
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+
+          <label>Email</label>
+
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="example@company.com"
+          >
+
+          <small
+            class="error"
+            *ngIf="
+              registerForm.get('email')?.touched &&
+              registerForm.get('email')?.invalid
+            "
+          >
+            Please enter a valid email.
+          </small>
+
+        </div>
+
+
+        <!-- CIN -->
+
+        <div class="form-group">
+
+          <label>CIN</label>
+
+          <input
+            type="text"
+            formControlName="cin"
+            maxlength="8"
+            placeholder="8 digit CIN"
+          >
+
+          <small
+            class="error"
+            *ngIf="
+              registerForm.get('cin')?.touched &&
+              registerForm.get('cin')?.invalid
+            "
+          >
+            CIN must contain exactly 8 digits.
+          </small>
+
+        </div>
+
+
+        <!-- PHONE -->
+
+        <div class="form-group">
+
+          <label>Phone number</label>
+
+          <input
+            type="tel"
+            formControlName="phoneNumber"
+            placeholder="+216..."
+          >
+
+        </div>
+
+
+        <!-- AGE -->
+
+        <div class="form-group">
+
+          <label>Age</label>
+
+          <input
+            title="age"
+            type="number"
+            formControlName="age"
+          >
+
+          <small
+            class="error"
+            *ngIf="
+              registerForm.get('age')?.touched &&
+              registerForm.get('age')?.invalid
+            "
+          >
+            Age must be between 18 and 100.
+          </small>
+
+        </div>
+
+
+        <!-- GENDER -->
+
+        <div class="form-group">
+
+          <label for="gender">Gender</label>
+
+          <select
+            id="gender"
+            formControlName="gender"
+          >
+
+            <option value="">Select gender</option>
+
+            <option
+              *ngFor="let gender of genders"
+              [value]="gender"
+            >
+              {{ gender }}
+            </option>
+
+          </select>
+
+          <small
+            class="error"
+            *ngIf="
+              registerForm.get('gender')?.touched &&
+              registerForm.get('gender')?.invalid
+            "
+          >
+            Please select a gender.
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- ============================================
+           STEP 2 : PROFESSIONAL INFO
+           ============================================ -->
+
+      <div
+        class="step-content"
+        [class.hidden]="currentStep !== 2"
+      >
+
+        <!-- EMPLOYEE PROFILE -->
+
+        <div class="form-group">
+
+          <label for="employeeProfile">Employee Profile</label>
+
+          <select
+            id="employeeProfile"
+            formControlName="employeeProfile"
+          >
+
+            <option value="">Select profile</option>
+
+            <option
+              *ngFor="let profile of employeeProfiles"
+              [value]="profile"
+            >
+              {{ profile }}
+            </option>
+
+          </select>
+
+          <small
+            class="error"
+            *ngIf="
+              registerForm.get('employeeProfile')?.touched &&
+              registerForm.get('employeeProfile')?.invalid
+            "
+          >
+            Please select a profile.
+          </small>
+
+        </div>
+
+
+        <!-- DEPARTMENT -->
+
+        <div class="form-group">
+
+          <label for="department">Department</label>
+
+          <select
+            id="department"
+            formControlName="departmentName"
+          >
+
+            <option value="">Select department</option>
+
+            <option
+              *ngFor="let department of departments"
+              [value]="department.name"
+            >
+              {{ department.name }}
+            </option>
+
+          </select>
+
+          <small
+            class="error"
+            *ngIf="
+              registerForm.get('departmentName')?.touched &&
+              registerForm.get('departmentName')?.invalid
+            "
+          >
+            Please select a department.
+          </small>
+
+        </div>
+
+
+        <!-- PROFILE IMAGE (File Input) -->
+
+        <div class="form-group">
+
+          <label>Profile image</label>
+
+          <div
+            class="file-dropzone"
+            [class.has-file]="imagePreview"
+            (click)="fileInput.click()"
+          >
+
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              class="file-input-hidden"
+              (change)="onFileSelected($event)"
+            >
+
+            <!-- Preview -->
+            <img
+              *ngIf="imagePreview"
+              [src]="imagePreview"
+              class="image-preview"
+              alt="Preview"
+            >
+
+            <!-- Placeholder -->
+            <div
+              *ngIf="!imagePreview"
+              class="dropzone-placeholder"
+            >
+              <svg
+                class="upload-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <span>Click to upload an image</span>
+              <span class="dropzone-hint">JPG, PNG or GIF</span>
+            </div>
+
+            <!-- Remove button -->
+            <button
+              *ngIf="imagePreview"
+              type="button"
+              class="remove-image-btn"
+              (click)="removeImage($event)"
+            >
+              &#10005;
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+
+          <label>Password</label>
+
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Create a strong password"
+          >
+
+          <small
+            class="error"
+            *ngIf="
+              registerForm.get('password')?.touched &&
+              registerForm.get('password')?.invalid
+            "
+          >
+            Min 8 chars, uppercase, lowercase, number & special character.
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- ========== SERVER ERROR ========== -->
+
+      <div
+        class="server-error"
+        *ngIf="errorMessage"
+      >
+        {{ errorMessage }}
+      </div>
+
+
+      <!-- ========== SUCCESS ========== -->
+
+      <div
+        class="success"
+        *ngIf="successMessage"
+      >
+        {{ successMessage }}
+      </div>
+
+
+      <!-- ========== STEP NAVIGATION ========== -->
+
+      <div class="step-nav">
+
+        <!-- Previous -->
+        <button
+          *ngIf="currentStep === 2"
+          type="button"
+          class="btn-prev"
+          (click)="prevStep()"
+          [disabled]="loading"
+        >
+          Previous
+        </button>
+
+        <!-- Next (Step 1) -->
+        <button
+          *ngIf="currentStep === 1"
+          type="button"
+          class="btn-next"
+          (click)="nextStep()"
+          [disabled]="!isStep1Valid()"
+        >
+          Next
+        </button>
+
+        <!-- Submit (Step 2) -->
+        <button
+          *ngIf="currentStep === 2"
+          type="submit"
+          [disabled]="registerForm.invalid || loading"
+        >
+          {{ loading ? 'Creating account...' : 'Create account' }}
+        </button>
+
+      </div>
+
+    </form>
+
+
+    <!-- ========== BOTTOM LINK ========== -->
+
+    <p class="bottom-link">
+
+      Already have an account?
+
+      <a routerLink="/login">
+        Login
+      </a>
+
+    </p>
+
+  </div>
+
+</div>

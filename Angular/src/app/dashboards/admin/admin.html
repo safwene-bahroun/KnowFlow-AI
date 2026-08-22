@@ -1,0 +1,107 @@
+<div
+  class="admin-layout"
+  [class.sidebar-closed]="!sidebarOpen"
+>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-header">
+      <div class="logo">
+        KnowFlow AI
+      </div>
+    </div>
+
+
+    <nav class="sidebar-nav">
+      <a
+        routerLink="/admin/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+      >
+        <span class="icon">⌂</span>
+        <span class="label">Dashboard</span>
+      </a>
+
+      <a
+        routerLink="/admin/users"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+      >
+        <span class="icon">👤</span>
+        <span class="label">Users</span>
+      </a>
+
+      <a
+        routerLink="/admin/departments"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+      >
+        <span class="icon">🏢</span>
+        <span class="label">Departments</span>
+      </a>
+
+      <a
+        routerLink="/admin/documents"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+      >
+        <span class="icon">📄</span>
+        <span class="label">Documents</span>
+      </a>
+
+    </nav>
+
+
+    <div class="sidebar-footer">
+      <button
+        type="button"
+        (click)="logout()"
+        class="logout-btn"
+      >
+        <span class="icon">⎋</span>
+        <span class="label">Logout</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="toggleSidebar()"
+      >
+        ◀
+        <span class="label">Collapse</span>
+      </button>
+    </div>
+
+  </aside>
+
+
+  <main class="main-content">
+
+    <header class="topbar">
+
+      <button
+        type="button"
+        class="menu-button"
+        (click)="toggleSidebar()"
+      >
+        ☰
+      </button>
+
+      <div class="topbar-title">
+        Admin Panel
+      </div>
+
+      <div class="topbar-user">
+        {{ currentUser?.name }}
+        {{ currentUser?.familyName }}
+      </div>
+
+    </header>
+
+
+    <section class="page-content">
+      <router-outlet></router-outlet>
+    </section>
+
+  </main>
+
+</div>

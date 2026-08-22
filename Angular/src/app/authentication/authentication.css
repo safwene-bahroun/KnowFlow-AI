@@ -1,0 +1,282 @@
+/* ================================================
+   AUTH PAGES WRAPPER – Sliding Card Toggle
+   Capgemini Blue Dynamic
+   ================================================ */
+
+/* -----------------------------------------------
+   WRAPPER – hosts the shared background
+   ----------------------------------------------- */
+
+.auth-pages-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  overflow: hidden;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #002E5A;
+}
+
+/* ===== LAYER 1 : Background image + overlay ===== */
+
+.auth-pages-wrapper::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(
+      160deg,
+      rgba(0, 46, 90, 0.95) 0%,
+      rgba(0, 90, 150, 0.88) 30%,
+      rgba(0, 112, 173, 0.80) 55%,
+      rgba(77, 168, 218, 0.70) 80%,
+      rgba(168, 216, 240, 0.58) 100%
+    ),
+    url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1920&q=80')
+      center / cover no-repeat;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ===== LAYER 2 : Constellation particles ===== */
+
+.auth-pages-wrapper::after {
+  content: '';
+  position: fixed;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  top: 6%;
+  left: 4%;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow:
+    95px 48px 0 0.5px rgba(255,255,255,0.35),
+    175px 12px 0 0 rgba(255,255,255,0.45),
+    145px 115px 0 1.5px rgba(255,255,255,0.18),
+    58px 135px 0 0.5px rgba(255,255,255,0.30),
+    235px 88px 0 0 rgba(255,255,255,0.22),
+    30px 80px 0 0.5px rgba(255,255,255,0.28),
+    200px 160px 0 0 rgba(255,255,255,0.15),
+    315px 28px 0 1.5px rgba(255,255,255,0.28),
+    368px 78px 0 0 rgba(255,255,255,0.38),
+    295px 108px 0 0.5px rgba(255,255,255,0.20),
+    418px 48px 0 0.5px rgba(255,255,255,0.15),
+    340px 140px 0 0 rgba(255,255,255,0.12),
+    525px 58px 0 1.5px rgba(255,255,255,0.22),
+    578px 118px 0 0 rgba(255,255,255,0.32),
+    508px 148px 0 0.5px rgba(255,255,255,0.18),
+    628px 88px 0 0.5px rgba(255,255,255,0.35),
+    600px 28px 0 0 rgba(255,255,255,0.14),
+    660px 140px 0 1px rgba(255,255,255,0.10),
+    85px 425px 0 0.5px rgba(255,255,255,0.30),
+    168px 398px 0 1.5px rgba(255,255,255,0.18),
+    45px 468px 0 0 rgba(255,255,255,0.25),
+    190px 458px 0 0.5px rgba(255,255,255,0.14),
+    120px 520px 0 0 rgba(255,255,255,0.10),
+    468px 415px 0 0 rgba(255,255,255,0.30),
+    538px 445px 0 0.5px rgba(255,255,255,0.20),
+    415px 475px 0 1.5px rgba(255,255,255,0.14),
+    572px 388px 0 0.5px rgba(255,255,255,0.25),
+    490px 510px 0 0 rgba(255,255,255,0.10),
+    255px 255px 0 0.5px rgba(255,255,255,0.10),
+    405px 305px 0 0 rgba(255,255,255,0.07),
+    155px 325px 0 0.5px rgba(255,255,255,0.12),
+    505px 265px 0 0 rgba(255,255,255,0.08),
+    355px 505px 0 0.5px rgba(255,255,255,0.07),
+    655px 205px 0 0 rgba(255,255,255,0.10),
+    55px 255px 0 0.5px rgba(255,255,255,0.09),
+    685px 455px 0 0 rgba(255,255,255,0.07),
+    380px 180px 0 0.5px rgba(255,255,255,0.06),
+    720px 320px 0 0 rgba(255,255,255,0.08);
+  animation: wrapper-drift 45s ease-in-out infinite;
+}
+
+@keyframes wrapper-drift {
+  0%, 100% { transform: translate(0, 0); }
+  20%      { transform: translate(12px, -8px); }
+  40%      { transform: translate(-8px, 14px); }
+  60%      { transform: translate(10px, 6px); }
+  80%      { transform: translate(-14px, -4px); }
+}
+
+
+/* -----------------------------------------------
+   THE SLIDING VIEWPORT (CSS Grid Stack Trick)
+   ----------------------------------------------- */
+
+.card-viewport {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 460px;
+  /* Grid trick: stacks children on top of each other 
+     and sizes to the TALLEST one automatically */
+  display: grid;
+}
+
+.card-slide {
+  grid-area: 1 / 1; /* Force both into the exact same grid cell */
+  
+  /* Smooth sliding transition */
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.4s ease;
+  will-change: transform, opacity;
+}
+
+/* --- States --- */
+
+/* Inactive Login: slide out left */
+.slide-login:not(.is-active) {
+  transform: translateX(-110%) scale(0.95);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Inactive Register: slide out right */
+.slide-register:not(.is-active) {
+  transform: translateX(110%) scale(0.95);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Active Card: dead center */
+.is-active {
+  transform: translateX(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+
+/* -----------------------------------------------
+   KILL ALL CHILD BACKGROUNDS
+   ----------------------------------------------- */
+
+::ng-deep .auth-container {
+  min-height: auto !important;
+  background: transparent !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+::ng-deep .auth-container::before,
+::ng-deep .auth-container::after {
+  display: none !important;
+}
+
+::ng-deep .auth-card::before,
+::ng-deep .auth-card::after {
+  display: none !important;
+}
+
+::ng-deep .forgot-container::before,
+::ng-deep .forgot-container::after,
+::ng-deep .register-link::before,
+::ng-deep .register-link::after,
+::ng-deep .server-error::before,
+::ng-deep .form-group::before,
+::ng-deep .form-group::after,
+::ng-deep form::before,
+::ng-deep form::after,
+::ng-deep .auth-card > p::before,
+::ng-deep .auth-card > p::after,
+::ng-deep .auth-card > p:last-child::before,
+::ng-deep .auth-card > p:last-child::after,
+::ng-deep .auth-card > a::before,
+::ng-deep .auth-card h1::before {
+  display: none !important;
+}
+
+
+/* -----------------------------------------------
+   CARD STYLING (Shared by both)
+   ----------------------------------------------- */
+
+::ng-deep .auth-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2.8rem 2.4rem 2.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(90deg, #0070AD, #4DA8DA, #0070AD) 1;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow:
+    0 10px 45px rgba(0, 112, 173, 0.22),
+    0 1.5px 6px rgba(0, 112, 173, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    
+  /* Let the register card scroll internally if needed */
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+/* Thin scrollbar for the register card */
+::ng-deep .auth-card::-webkit-scrollbar {
+  width: 5px;
+}
+::ng-deep .auth-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+::ng-deep .auth-card::-webkit-scrollbar-thumb {
+  background: rgba(0, 112, 173, 0.2);
+  border-radius: 10px;
+}
+
+/* Keep button shine sweep alive */
+::ng-deep button[type="submit"]::after {
+  display: block !important;
+}
+
+
+/* -----------------------------------------------
+   REDUCED MOTION
+   ----------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-pages-wrapper::after {
+    animation: none !important;
+  }
+  .card-slide {
+    transition: opacity 0.2s ease !important;
+  }
+  .slide-login:not(.is-active),
+  .slide-register:not(.is-active) {
+    transform: none !important;
+  }
+}
+
+/* -----------------------------------------------
+   RESPONSIVE
+   ----------------------------------------------- */
+
+@media (max-width: 480px) {
+  .auth-pages-wrapper {
+    padding: 1rem 0.75rem;
+    align-items: flex-start;
+    padding-top: 3vh;
+  }
+
+  .card-viewport {
+    max-width: 100%;
+  }
+
+  ::ng-deep .auth-card {
+    padding: 2rem 1.4rem 1.8rem;
+    border-radius: 16px !important;
+    max-height: 92vh;
+  }
+}

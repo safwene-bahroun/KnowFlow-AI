@@ -1,0 +1,580 @@
+<div class="document-container">
+
+  <h2>Documents</h2>
+
+
+  <!-- ====================================== -->
+  <!-- MESSAGES -->
+  <!-- ====================================== -->
+
+  <div
+    *ngIf="successMessage"
+    class="success-message"
+  >
+    {{ successMessage }}
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="error-message"
+  >
+    {{ errorMessage }}
+  </div>
+
+
+  <!-- ====================================== -->
+  <!-- SEARCH AND FILTERS -->
+  <!-- ====================================== -->
+
+  <div class="filters">
+
+    <div>
+
+      <input
+        type="text"
+        placeholder="Search documents..."
+        [(ngModel)]="searchKeyword"
+        (keyup.enter)="searchDocuments()"
+      />
+
+      <button
+        type="button"
+        (click)="searchDocuments()"
+      >
+        Search
+      </button>
+
+    </div>
+
+
+    <!-- DEPARTMENT -->
+
+    <select
+      (change)="
+        filterByDepartment(
+          $any($event.target).value
+            ? +$any($event.target).value
+            : null
+        )
+      "
+    >
+
+      <option value="">
+        All Departments
+      </option>
+
+      <option
+        *ngFor="let department of departments"
+        [value]="department.id"
+      >
+        {{ department.name }}
+      </option>
+
+    </select>
+
+
+    <!-- STATUS -->
+
+    <select
+      (change)="
+        filterByStatus(
+          $any($event.target).value
+        )
+      "
+    >
+
+      <option value="">
+        All Statuses
+      </option>
+
+      <option
+        *ngFor="let status of documentStatuses"
+        [value]="status"
+      >
+        {{ status }}
+      </option>
+
+    </select>
+
+
+    <!-- VISIBILITY -->
+
+    <select
+      (change)="
+        filterByVisibility(
+          $any($event.target).value
+        )
+      "
+    >
+
+      <option value="">
+        All Visibility
+      </option>
+
+      <option
+        *ngFor="
+          let visibility
+          of documentVisibilities
+        "
+        [value]="visibility"
+      >
+        {{ visibility }}
+      </option>
+
+    </select>
+
+
+    <button
+      type="button"
+      (click)="loadDocuments()"
+    >
+      Reset
+    </button>
+
+  </div>
+
+
+  <!-- ====================================== -->
+  <!-- DOCUMENT FORM -->
+  <!-- ====================================== -->
+
+  <div class="document-form">
+
+    <h3>
+      {{
+        isEditing
+          ? 'Edit Document'
+          : 'Add Document'
+      }}
+    </h3>
+
+
+    <form
+      [formGroup]="documentForm"
+      (ngSubmit)="
+        isEditing
+          ? updateDocument()
+          : createDocument()
+      "
+    >
+
+
+      <!-- NAME -->
+
+      <div class="form-group">
+
+        <label>
+          Document Name
+        </label>
+
+        <input
+          type="text"
+          formControlName="name"
+        />
+
+        <small
+          *ngIf="
+            nameControl.invalid &&
+            nameControl.touched
+          "
+        >
+          Document name is required.
+        </small>
+
+      </div>
+
+
+      <!-- URL -->
+
+      <div class="form-group">
+
+        <label>
+          Document URL
+        </label>
+
+        <input
+          type="text"
+          formControlName="url"
+          placeholder="https://..."
+        />
+
+        <small
+          *ngIf="
+            urlControl.invalid &&
+            urlControl.touched
+          "
+        >
+          URL is required.
+        </small>
+
+      </div>
+
+
+      <!-- MIME TYPE -->
+
+      <div class="form-group">
+
+        <label>
+          MIME Type
+        </label>
+
+        <input
+          type="text"
+          formControlName="mimeType"
+          placeholder="application/pdf"
+        />
+
+      </div>
+
+
+      <!-- FILE SIZE -->
+
+      <div class="form-group">
+
+        <label>
+          File Size (bytes)
+        </label>
+
+        <input
+          type="number"
+          formControlName="fileSize"
+        />
+
+      </div>
+
+
+      <!-- DESCRIPTION -->
+
+      <div class="form-group">
+
+        <label>
+          Description
+        </label>
+
+        <textarea
+          formControlName="description"
+          rows="4"
+        ></textarea>
+
+      </div>
+
+
+      <!-- AUTHOR -->
+
+      <div class="form-group">
+
+        <label>
+          Author
+        </label>
+
+        <input
+          type="text"
+          formControlName="author"
+        />
+
+      </div>
+
+
+      <!-- STATUS -->
+
+      <div class="form-group">
+
+        <label>
+          Status
+        </label>
+
+        <select
+          formControlName="status"
+        >
+
+          <option
+            *ngFor="
+              let status
+              of documentStatuses
+            "
+            [value]="status"
+          >
+            {{ status }}
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- VISIBILITY -->
+
+      <div class="form-group">
+
+        <label>
+          Visibility
+        </label>
+
+        <select
+          formControlName="visibility"
+        >
+
+          <option
+            *ngFor="
+              let visibility
+              of documentVisibilities
+            "
+            [value]="visibility"
+          >
+            {{ visibility }}
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- DEPARTMENT -->
+
+      <div class="form-group">
+
+        <label>
+          Department
+        </label>
+
+        <select
+          formControlName="departmentId"
+        >
+
+          <option [ngValue]="null">
+            No Department
+          </option>
+
+          <option
+            *ngFor="
+              let department
+              of departments
+            "
+            [ngValue]="department.id"
+          >
+            {{ department.name }}
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- BUTTONS -->
+
+      <button
+        type="submit"
+        [disabled]="documentForm.invalid"
+      >
+        {{
+          isEditing
+            ? 'Update'
+            : 'Create'
+        }}
+      </button>
+
+
+      <button
+        *ngIf="isEditing"
+        type="button"
+        (click)="resetForm()"
+      >
+        Cancel
+      </button>
+
+    </form>
+
+  </div>
+
+
+  <!-- ====================================== -->
+  <!-- DOCUMENT LIST -->
+  <!-- ====================================== -->
+
+  <div class="document-list">
+
+    <h3>
+      Document List
+    </h3>
+
+
+    <div *ngIf="isLoading">
+      Loading documents...
+    </div>
+
+
+    <table
+      *ngIf="
+        !isLoading &&
+        documents.length > 0
+      "
+    >
+
+      <thead>
+
+        <tr>
+
+          <th>ID</th>
+
+          <th>Name</th>
+
+          <th>Author</th>
+
+          <th>Department</th>
+
+          <th>Status</th>
+
+          <th>Visibility</th>
+
+          <th>Actions</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        <tr
+          *ngFor="
+            let document
+            of documents
+          "
+        >
+
+          <td>
+            {{ document.id }}
+          </td>
+
+
+          <td>
+            {{ document.name }}
+          </td>
+
+
+          <td>
+            {{ document.author || '-' }}
+          </td>
+
+
+          <td>
+            {{
+              document.department?.name
+                || '-'
+            }}
+          </td>
+
+
+          <!-- STATUS -->
+
+          <td>
+
+            <select
+              [ngModel]="document.status"
+              (ngModelChange)="
+                changeStatus(
+                  document,
+                  $event
+                )
+              "
+            >
+
+              <option
+                *ngFor="
+                  let status
+                  of documentStatuses
+                "
+                [ngValue]="status"
+              >
+                {{ status }}
+              </option>
+
+            </select>
+
+          </td>
+
+
+          <!-- VISIBILITY -->
+
+          <td>
+
+            <select
+              [ngModel]="document.visibility"
+              (ngModelChange)="
+                changeVisibility(
+                  document,
+                  $event
+                )
+              "
+            >
+
+              <option
+                *ngFor="
+                  let visibility
+                  of documentVisibilities
+                "
+                [ngValue]="visibility"
+              >
+                {{ visibility }}
+              </option>
+
+            </select>
+
+          </td>
+
+
+          <!-- ACTIONS -->
+
+          <td>
+
+            <button
+              type="button"
+              (click)="
+                editDocument(document)
+              "
+            >
+              Edit
+            </button>
+
+
+            <button
+              type="button"
+              (click)="
+                deleteDocument(
+                  document.id
+                )
+              "
+            >
+              Delete
+            </button>
+
+
+            <a
+              [href]="document.url"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open
+            </a>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+
+    <p
+      *ngIf="
+        !isLoading &&
+        documents.length === 0
+      "
+    >
+      No documents found.
+    </p>
+
+  </div>
+
+</div>

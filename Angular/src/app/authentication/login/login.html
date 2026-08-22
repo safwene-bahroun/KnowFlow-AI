@@ -1,0 +1,131 @@
+
+<div class="auth-container">
+  <div class="back-btn-wrapper">
+    <button routerLink="/Home"><--Back to Home</button>
+  </div>
+  <div class="auth-card">
+
+    <h1>Welcome Back</h1>
+
+    <p class="subtitle">
+      Sign in to your KnowFlow AI account
+    </p>
+
+
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="login()"
+    >
+
+      <!-- EMAIL -->
+
+      <div class="form-group">
+
+        <label for="email">
+          Email
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+        >
+
+        <small
+          class="error"
+          *ngIf="
+            loginForm.get('email')?.touched &&
+            loginForm.get('email')?.invalid
+          "
+        >
+          Please enter a valid email.
+        </small>
+
+      </div>
+
+
+      <!-- PASSWORD -->
+
+      <div class="form-group">
+
+        <label for="password">
+          Password
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Enter your password"
+        >
+
+        <small
+          class="error"
+          *ngIf="
+            loginForm.get('password')?.touched &&
+            loginForm.get('password')?.invalid
+          "
+        >
+          Password is required.
+        </small>
+
+      </div>
+
+
+      <!-- FORGOT PASSWORD -->
+
+      <div class="forgot-container">
+
+        <a routerLink="/forgot-password">
+          Forgot password?
+        </a>
+
+      </div>
+
+
+      <!-- ERROR -->
+
+      <div
+        class="server-error"
+        *ngIf="errorMessage"
+      >
+        {{ errorMessage }}
+      </div>
+
+
+      <!-- BUTTON -->
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || loading"
+      >
+
+        <span *ngIf="!loading">
+          Login
+        </span>
+
+        <span *ngIf="loading">
+          Logging in...
+        </span>
+
+      </button>
+
+    </form>
+
+
+    <!-- REGISTER -->
+
+    <p class="register-link">
+
+      Don't have an account?
+
+      <a routerLink="/register">
+        Create account
+      </a>
+
+    </p>
+
+  </div>
+
+</div>

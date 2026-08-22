@@ -1,0 +1,936 @@
+/* ================================================
+   REGISTER COMPONENT – Capgemini Blue Dynamic
+   Two-Step Pagination + File Input
+   ================================================
+   Primary Blue  : #0070AD
+   Deep Navy     : #002E5A
+   Blue Ciel     : #4DA8DA
+   Light Ciel    : #A8D8F0
+   White         : #FFFFFF
+   Dark Text     : #1B2A4A
+   Muted Text    : #5A6B85
+   Success Green : #1A8754
+   ================================================ */
+
+/* -----------------------------------------------
+   CONTAINER
+   ----------------------------------------------- */
+
+.auth-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  overflow: hidden;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #002E5A;
+}
+
+/* ===== LAYER 1 : Background image + overlay ===== */
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      160deg,
+      rgba(0, 46, 90, 0.94) 0%,
+      rgba(0, 90, 150, 0.85) 30%,
+      rgba(0, 112, 173, 0.78) 55%,
+      rgba(77, 168, 218, 0.68) 80%,
+      rgba(168, 216, 240, 0.55) 100%
+    ),
+    url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1920&q=80')
+      center / cover no-repeat;
+  z-index: 0;
+}
+
+/* ===== LAYER 2 : Constellation particles ===== */
+
+.auth-container::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  top: 6%;
+  left: 4%;
+  z-index: 2;
+  box-shadow:
+    95px 48px 0 0.5px rgba(255,255,255,0.35),
+    175px 12px 0 0 rgba(255,255,255,0.45),
+    145px 115px 0 1.5px rgba(255,255,255,0.18),
+    58px 135px 0 0.5px rgba(255,255,255,0.30),
+    235px 88px 0 0 rgba(255,255,255,0.22),
+    30px 80px 0 0.5px rgba(255,255,255,0.28),
+    200px 160px 0 0 rgba(255,255,255,0.15),
+    315px 28px 0 1.5px rgba(255,255,255,0.28),
+    368px 78px 0 0 rgba(255,255,255,0.38),
+    295px 108px 0 0.5px rgba(255,255,255,0.20),
+    418px 48px 0 0.5px rgba(255,255,255,0.15),
+    340px 140px 0 0 rgba(255,255,255,0.12),
+    525px 58px 0 1.5px rgba(255,255,255,0.22),
+    578px 118px 0 0 rgba(255,255,255,0.32),
+    508px 148px 0 0.5px rgba(255,255,255,0.18),
+    628px 88px 0 0.5px rgba(255,255,255,0.35),
+    600px 28px 0 0 rgba(255,255,255,0.14),
+    660px 140px 0 1px rgba(255,255,255,0.10),
+    85px 425px 0 0.5px rgba(255,255,255,0.30),
+    168px 398px 0 1.5px rgba(255,255,255,0.18),
+    45px 468px 0 0 rgba(255,255,255,0.25),
+    190px 458px 0 0.5px rgba(255,255,255,0.14),
+    120px 520px 0 0 rgba(255,255,255,0.10),
+    468px 415px 0 0 rgba(255,255,255,0.30),
+    538px 445px 0 0.5px rgba(255,255,255,0.20),
+    415px 475px 0 1.5px rgba(255,255,255,0.14),
+    572px 388px 0 0.5px rgba(255,255,255,0.25),
+    490px 510px 0 0 rgba(255,255,255,0.10),
+    255px 255px 0 0.5px rgba(255,255,255,0.10),
+    405px 305px 0 0 rgba(255,255,255,0.07),
+    155px 325px 0 0.5px rgba(255,255,255,0.12),
+    505px 265px 0 0 rgba(255,255,255,0.08),
+    355px 505px 0 0.5px rgba(255,255,255,0.07),
+    655px 205px 0 0 rgba(255,255,255,0.10),
+    55px 255px 0 0.5px rgba(255,255,255,0.09),
+    685px 455px 0 0 rgba(255,255,255,0.07),
+    380px 180px 0 0.5px rgba(255,255,255,0.06),
+    720px 320px 0 0 rgba(255,255,255,0.08);
+  animation: drift-constellation 45s ease-in-out infinite;
+}
+
+@keyframes drift-constellation {
+  0%, 100% { transform: translate(0, 0); }
+  20%      { transform: translate(12px, -8px); }
+  40%      { transform: translate(-8px, 14px); }
+  60%      { transform: translate(10px, 6px); }
+  80%      { transform: translate(-14px, -4px); }
+}
+
+/* ===== LAYER 3 : Rotating ring – top right ===== */
+
+.auth-card::before {
+  content: '';
+  position: fixed;
+  top: -4%;
+  right: -4%;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  outline: 1.5px solid rgba(255, 255, 255, 0.05);
+  outline-offset: -45px;
+  z-index: 1;
+  pointer-events: none;
+  animation: spin-ring 28s linear infinite;
+  box-shadow:
+    inset 0 0 60px rgba(77, 168, 218, 0.04),
+    0 0 80px rgba(0, 112, 173, 0.05);
+}
+
+@keyframes spin-ring {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ===== LAYER 4 : Hexagon outline – bottom left ===== */
+
+.auth-card::after {
+  content: '';
+  position: fixed;
+  bottom: -6%;
+  left: -4%;
+  width: 220px;
+  height: 220px;
+  background:
+    linear-gradient(
+      rgba(255, 255, 255, 0.10),
+      rgba(255, 255, 255, 0.06)
+    ) border-box,
+    transparent padding-box;
+  border: 2px solid transparent;
+  clip-path: polygon(
+    50% 0%, 100% 25%, 100% 75%,
+    50% 100%, 0% 75%, 0% 25%
+  );
+  z-index: 1;
+  pointer-events: none;
+  animation: spin-hex 35s linear infinite reverse;
+}
+
+@keyframes spin-hex {
+  from { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.05); }
+  to   { transform: rotate(360deg) scale(1); }
+}
+
+/* ===== LAYER 5 : Diagonal light streak ===== */
+
+.step-indicator::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -30%;
+  width: 180%;
+  height: 180%;
+  background: linear-gradient(
+    130deg,
+    transparent 43%,
+    rgba(255, 255, 255, 0.025) 44.5%,
+    rgba(255, 255, 255, 0.05) 46%,
+    rgba(255, 255, 255, 0.025) 47.5%,
+    transparent 49%
+  );
+  z-index: 1;
+  pointer-events: none;
+  animation: streak-move 22s linear infinite;
+}
+
+@keyframes streak-move {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(80px, 80px) rotate(3deg); }
+}
+
+/* ===== LAYER 6 : Floating triangle ===== */
+
+.step-indicator::after {
+  content: '';
+  position: fixed;
+  top: 18%;
+  left: 72%;
+  width: 50px;
+  height: 50px;
+  background:
+    linear-gradient(
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.03)
+    ) border-box,
+    transparent padding-box;
+  border: 1.5px solid transparent;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  z-index: 1;
+  pointer-events: none;
+  animation: float-triangle 12s ease-in-out infinite;
+}
+
+@keyframes float-triangle {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.7; }
+  25%      { transform: translate(-15px, 20px) rotate(15deg); opacity: 1; }
+  50%      { transform: translate(10px, -10px) rotate(-5deg); opacity: 0.5; }
+  75%      { transform: translate(-8px, -18px) rotate(10deg); opacity: 0.9; }
+}
+
+/* ===== LAYER 7 & 8 : Pulsing nodes ===== */
+
+.bottom-link::before {
+  content: '';
+  position: fixed;
+  bottom: 22%;
+  right: 15%;
+  width: 8px;
+  height: 8px;
+  background: rgba(77, 168, 218, 0.25);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: pulse-node 3s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(77, 168, 218, 0.15);
+}
+
+.bottom-link::after {
+  content: '';
+  position: fixed;
+  top: 35%;
+  left: 12%;
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: pulse-node 4s ease-in-out 1.5s infinite;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
+}
+
+@keyframes pulse-node {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50%      { transform: scale(1.8); opacity: 0; }
+}
+
+/* ===== LAYER 9 : Scan line ===== */
+
+.server-error::before {
+  content: '';
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(77, 168, 218, 0.08) 20%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(77, 168, 218, 0.08) 80%,
+    transparent 100%
+  );
+  z-index: 3;
+  pointer-events: none;
+  animation: scan-line 8s linear infinite;
+}
+
+@keyframes scan-line {
+  0%   { top: -2px; }
+  100% { top: 100%; }
+}
+
+
+/* -----------------------------------------------
+   BACK BUTTON
+   ----------------------------------------------- */
+
+.back-btn-wrapper {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 20;
+}
+
+.back-btn-wrapper button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.back-btn-wrapper button:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+
+/* -----------------------------------------------
+   CARD
+   ----------------------------------------------- */
+
+.auth-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.94);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2.2rem 2.2rem 1.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(90deg, #0070AD, #4DA8DA, #0070AD) 1;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  animation: card-breathe 5s ease-in-out infinite;
+}
+
+.auth-card::-webkit-scrollbar { width: 5px; }
+.auth-card::-webkit-scrollbar-track { background: transparent; }
+.auth-card::-webkit-scrollbar-thumb {
+  background: rgba(0, 112, 173, 0.18);
+  border-radius: 10px;
+}
+.auth-card::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 112, 173, 0.32);
+}
+
+@keyframes card-breathe {
+  0%, 100% {
+    box-shadow:
+      0 8px 40px rgba(0, 112, 173, 0.18),
+      0 1.5px 6px rgba(0, 112, 173, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  50% {
+    box-shadow:
+      0 14px 55px rgba(0, 112, 173, 0.28),
+      0 2px 8px rgba(0, 112, 173, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+}
+
+
+/* -----------------------------------------------
+   HEADING
+   ----------------------------------------------- */
+
+.auth-card h1 {
+  margin: 0 0 0.3rem;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #0070AD;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0 0 1.4rem;
+  font-size: 0.9rem;
+  color: #5A6B85;
+  font-weight: 400;
+}
+
+
+/* -----------------------------------------------
+   STEP INDICATOR
+   ----------------------------------------------- */
+
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #99B4CC;
+  background: #F4FAFF;
+  border: 2px solid #D6EEFF;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-num {
+  color: #FFFFFF;
+  background: #0070AD;
+  border-color: #0070AD;
+  box-shadow: 0 2px 10px rgba(0, 112, 173, 0.3);
+}
+
+.step.completed .step-num {
+  color: #FFFFFF;
+  background: #1A8754;
+  border-color: #1A8754;
+  box-shadow: 0 2px 10px rgba(26, 135, 84, 0.3);
+}
+
+.step-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #99B4CC;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: color 0.3s ease;
+}
+
+.step.active .step-label {
+  color: #0070AD;
+}
+
+.step.completed .step-label {
+  color: #1A8754;
+}
+
+.step-line {
+  width: 60px;
+  height: 2px;
+  background: #D6EEFF;
+  margin: 0 0.6rem;
+  margin-bottom: 1.4rem;
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.step-line.active {
+  background: linear-gradient(90deg, #1A8754, #0070AD);
+}
+
+
+/* -----------------------------------------------
+   STEP CONTENT
+   ----------------------------------------------- */
+
+.step-content {
+  animation: step-fade-in 0.3s ease forwards;
+}
+
+.step-content.hidden {
+  display: none;
+}
+
+@keyframes step-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* -----------------------------------------------
+   FORM GROUP
+   ----------------------------------------------- */
+
+.form-group {
+  margin-bottom: 1.05rem;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1B2A4A;
+  letter-spacing: 0.01em;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.88rem;
+  color: #1B2A4A;
+  background: #F4FAFF;
+  border: 1.5px solid #D6EEFF;
+  border-radius: 10px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-group input::placeholder {
+  color: #99B4CC;
+  font-weight: 400;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #0070AD;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(0, 112, 173, 0.12);
+}
+
+.form-group input.ng-invalid.ng-touched {
+  border-color: #D9534F;
+  background: #FFF9F9;
+}
+
+.form-group input.ng-invalid.ng-touched:focus {
+  box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.12);
+}
+
+/* --- select --- */
+
+.form-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  padding-right: 2.2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230070AD' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 12px 8px;
+}
+
+.form-group select option {
+  color: #1B2A4A;
+  background: #FFFFFF;
+}
+
+.form-group select.ng-invalid.ng-touched {
+  border-color: #D9534F;
+  background-color: #FFF9F9;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D9534F' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+
+/* -----------------------------------------------
+   FILE DROPZONE
+   ----------------------------------------------- */
+
+.file-dropzone {
+  position: relative;
+  border: 2px dashed #D6EEFF;
+  border-radius: 12px;
+  padding: 1.4rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: #F4FAFF;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.file-dropzone:hover {
+  border-color: #0070AD;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(0, 112, 173, 0.08);
+}
+
+.file-dropzone.has-file {
+  border-color: #1A8754;
+  border-style: solid;
+  background: #F8FDF9;
+  padding: 0.8rem;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.dropzone-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #99B4CC;
+}
+
+.dropzone-placeholder span {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.dropzone-hint {
+  font-size: 0.72rem !important;
+  color: #B0C8DB !important;
+}
+
+.upload-icon {
+  width: 36px;
+  height: 36px;
+  color: #4DA8DA;
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 140px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #FFFFFF;
+  background: #D9534F;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(217, 83, 79, 0.3);
+}
+
+.remove-image-btn:hover {
+  background: #C0392B;
+  transform: scale(1.1);
+}
+
+
+/* -----------------------------------------------
+   ERROR / SUCCESS MESSAGES
+   ----------------------------------------------- */
+
+.error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  color: #D9534F;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.server-error {
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #D9534F;
+  background: #FFF3F3;
+  border: 1px solid #FACBCB;
+  border-radius: 10px;
+  line-height: 1.4;
+  position: relative;
+  z-index: 10;
+}
+
+.success {
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #1A8754;
+  background: #EEFBF3;
+  border: 1px solid #B8E8CC;
+  border-radius: 10px;
+  line-height: 1.4;
+}
+
+
+/* -----------------------------------------------
+   STEP NAVIGATION BUTTONS
+   ----------------------------------------------- */
+
+.step-nav {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+}
+
+.step-nav button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition:
+    opacity 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Previous button */
+.btn-prev {
+  color: #0070AD;
+  background: #E8F4FD;
+  flex: 0.6;
+}
+
+.btn-prev:hover:not(:disabled) {
+  background: #D6EEFF;
+  transform: translateY(-1px);
+}
+
+.btn-prev:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Next button */
+.btn-next {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #0070AD 0%, #4DA8DA 100%);
+  box-shadow: 0 2px 10px rgba(0, 112, 173, 0.25);
+}
+
+.btn-next:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 112, 173, 0.35);
+}
+
+.btn-next:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Submit button (reuses main button style) */
+.step-nav button[type="submit"] {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #0070AD 0%, #4DA8DA 100%);
+  box-shadow: 0 2px 10px rgba(0, 112, 173, 0.25);
+}
+
+.step-nav button[type="submit"]:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 112, 173, 0.35);
+}
+
+.step-nav button[type="submit"]:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Shine sweep on next + submit */
+.btn-next::after,
+.step-nav button[type="submit"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.18),
+    transparent
+  );
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.btn-next:hover:not(:disabled)::after,
+.step-nav button[type="submit"]:hover:not(:disabled)::after {
+  left: 120%;
+}
+
+
+/* -----------------------------------------------
+   BOTTOM LINK
+   ----------------------------------------------- */
+
+.bottom-link {
+  text-align: center;
+  margin: 1.2rem 0 0;
+  font-size: 0.85rem;
+  color: #5A6B85;
+  position: relative;
+}
+
+.bottom-link a {
+  color: #0070AD;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 0.2rem;
+  transition: color 0.2s ease;
+}
+
+.bottom-link a:hover {
+  color: #4DA8DA;
+  text-decoration: underline;
+}
+
+
+/* -----------------------------------------------
+   REDUCED MOTION
+   ----------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-container::after,
+  .auth-card::before,
+  .auth-card::after,
+  .step-indicator::before,
+  .step-indicator::after,
+  .bottom-link::before,
+  .bottom-link::after,
+  .server-error::before,
+  .auth-card,
+  .step-content {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+/* -----------------------------------------------
+   RESPONSIVE
+   ----------------------------------------------- */
+
+@media (max-width: 768px) {
+  .auth-card::before {
+    width: 260px;
+    height: 260px;
+  }
+
+  .auth-card::after {
+    width: 160px;
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 0.8rem 0.6rem;
+  }
+
+  .back-btn-wrapper {
+    top: 12px;
+    left: 12px;
+  }
+
+  .back-btn-wrapper button {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .auth-card {
+    padding: 1.6rem 1.2rem 1.4rem;
+    border-radius: 16px;
+    max-height: 95vh;
+  }
+
+  .auth-card h1 {
+    font-size: 1.4rem;
+  }
+
+  .step-line {
+    width: 40px;
+  }
+
+  .step-num {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .form-group {
+    margin-bottom: 0.85rem;
+  }
+
+  .auth-card::before,
+  .auth-card::after,
+  .step-indicator::before,
+  .step-indicator::after {
+    display: none;
+  }
+}

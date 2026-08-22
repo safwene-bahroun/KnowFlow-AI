@@ -1,0 +1,259 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+
+/* ========================= */
+/* SIDEBAR */
+/* ========================= */
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #e5e5e5;
+
+  display: flex;
+  flex-direction: column;
+
+  transition: width 0.25s ease;
+}
+
+
+.sidebar-header {
+  height: 70px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 20px;
+
+  border-bottom: 1px solid #eee;
+}
+
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+
+/* ========================= */
+/* NAVIGATION */
+/* ========================= */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px 12px;
+
+  gap: 5px;
+}
+
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 12px 14px;
+
+  border-radius: 8px;
+
+  text-decoration: none;
+
+  color: #555;
+
+  transition: 0.2s;
+
+  cursor: pointer;
+}
+
+
+.sidebar-nav a:hover {
+  background: #f2f2f2;
+}
+
+
+.sidebar-nav a.active {
+  background: #eeeeee;
+  color: #111;
+  font-weight: 600;
+}
+
+
+.icon {
+  width: 24px;
+  text-align: center;
+}
+
+
+.label {
+  white-space: nowrap;
+}
+
+
+/* ========================= */
+/* FOOTER */
+/* ========================= */
+
+.sidebar-footer {
+  margin-top: auto;
+
+  padding: 15px;
+
+  border-top: 1px solid #eee;
+}
+
+
+.sidebar-footer button {
+  width: 100%;
+
+  padding: 10px;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  display: flex;
+
+  gap: 10px;
+
+  align-items: center;
+}
+
+
+/* ========================= */
+/* MAIN */
+/* ========================= */
+
+.main-content {
+  flex: 1;
+
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+/* ========================= */
+/* TOPBAR */
+/* ========================= */
+
+.topbar {
+  height: 70px;
+
+  background: white;
+
+  border-bottom: 1px solid #eee;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 25px;
+
+  gap: 20px;
+}
+
+
+.menu-button {
+  border: none;
+
+  background: transparent;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+
+.topbar-title {
+  font-size: 18px;
+
+  font-weight: 600;
+
+  flex: 1;
+}
+
+
+.topbar-user {
+  font-weight: 600;
+}
+
+
+/* ========================= */
+/* PAGE CONTENT */
+/* ========================= */
+
+.page-content {
+  padding: 30px;
+
+  flex: 1;
+}
+
+
+/* ========================= */
+/* COLLAPSED */
+/* ========================= */
+
+.sidebar-closed .sidebar {
+  width: 70px;
+}
+
+
+.sidebar-closed .sidebar .label {
+  display: none;
+}
+
+
+.sidebar-closed .logo {
+  font-size: 0;
+}
+
+
+.sidebar-closed .logo::after {
+  content: "KF";
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+
+.sidebar-closed .sidebar-header {
+  justify-content: center;
+}
+
+
+@media (max-width: 768px) {
+
+  .sidebar {
+    width: 70px;
+  }
+
+  .sidebar .label {
+    display: none;
+  }
+
+  .logo {
+    font-size: 0;
+  }
+
+  .logo::after {
+    content: "KF";
+    font-size: 18px;
+  }
+
+  .sidebar-header {
+    justify-content: center;
+  }
+
+}
