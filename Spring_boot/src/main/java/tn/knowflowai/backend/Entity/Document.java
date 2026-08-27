@@ -1,8 +1,7 @@
 package tn.knowflowai.backend.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,6 +17,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import tn.knowflowai.backend.Entity.Enum.DocumentStatus;
 import tn.knowflowai.backend.Entity.Enum.DocumentVisibility;
 
@@ -44,12 +45,24 @@ public class Document extends BaseEntity {
     @Column(length = 500)
     private String description;
 
-    /*
-     * The person who wrote/created the document.
-     * This is just a name/text, not a User relationship.
-     */
     @Column(length = 255)
     private String author;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "created_by_id")
+    @JsonIgnoreProperties({
+        "password",
+        "department",
+        "documents",
+        "conversations",
+        "notifications",
+        "feedbacks",
+        "documentAccesses",
+        "createdDocuments",
+        "hibernateLazyInitializer",
+        "handler"
+    })
+    private User createdBy;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -59,55 +72,58 @@ public class Document extends BaseEntity {
     @Column(nullable = false, length = 30)
     private DocumentVisibility visibility;
 
-    /*
-     * Department to which the document belongs.
-     *
-     * Used especially when visibility = DEPARTMENT.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id")
+    @JsonIgnoreProperties({
+        "documents",
+        "users",
+        "hibernateLazyInitializer",
+        "handler"
+    })
     private Department department;
 
     @OneToMany(
-            mappedBy = "document",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+        mappedBy = "document",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
     )
     @OrderBy("chunkIndex ASC")
+    @JsonIgnore
     private List<DocumentChunk> chunks = new ArrayList<>();
 
     @OneToMany(
-            mappedBy = "document",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+        mappedBy = "document",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
     )
+    @JsonIgnore
     private List<DocumentAccess> accessList = new ArrayList<>();
 
     @OneToOne(
-            mappedBy = "document",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+        mappedBy = "document",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
     )
+    @JsonIgnore
     private DocumentVerification verification;
 
     @OneToMany(mappedBy = "document")
+    @JsonIgnore
     private List<Feedback> feedbacks = new ArrayList<>();
-
 
     public Document() {
     }
 
-
     public Document(
-            String name,
-            String url,
-            String mimeType,
-            Long fileSize,
-            String description,
-            String author,
-            DocumentStatus status,
-            DocumentVisibility visibility,
-            Department department
+        String name,
+        String url,
+        String mimeType,
+        Long fileSize,
+        String description,
+        String author,
+        DocumentStatus status,
+        DocumentVisibility visibility,
+        Department department
     ) {
         this.name = name;
         this.url = url;
@@ -120,7 +136,6 @@ public class Document extends BaseEntity {
         this.department = department;
     }
 
-
     public Long getId() {
         return id;
     }
@@ -128,7 +143,6 @@ public class Document extends BaseEntity {
     public void setId(Long id) {
         this.id = id;
     }
-
 
     public String getName() {
         return name;
@@ -138,7 +152,6 @@ public class Document extends BaseEntity {
         this.name = name;
     }
 
-
     public String getUrl() {
         return url;
     }
@@ -146,7 +159,6 @@ public class Document extends BaseEntity {
     public void setUrl(String url) {
         this.url = url;
     }
-
 
     public String getMimeType() {
         return mimeType;
@@ -156,7 +168,6 @@ public class Document extends BaseEntity {
         this.mimeType = mimeType;
     }
 
-
     public Long getFileSize() {
         return fileSize;
     }
@@ -164,7 +175,6 @@ public class Document extends BaseEntity {
     public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
     }
-
 
     public String getDescription() {
         return description;
@@ -174,7 +184,6 @@ public class Document extends BaseEntity {
         this.description = description;
     }
 
-
     public String getAuthor() {
         return author;
     }
@@ -183,6 +192,13 @@ public class Document extends BaseEntity {
         this.author = author;
     }
 
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
 
     public DocumentStatus getStatus() {
         return status;
@@ -192,7 +208,6 @@ public class Document extends BaseEntity {
         this.status = status;
     }
 
-
     public DocumentVisibility getVisibility() {
         return visibility;
     }
@@ -200,7 +215,6 @@ public class Document extends BaseEntity {
     public void setVisibility(DocumentVisibility visibility) {
         this.visibility = visibility;
     }
-
 
     public Department getDepartment() {
         return department;
@@ -210,7 +224,6 @@ public class Document extends BaseEntity {
         this.department = department;
     }
 
-
     public List<DocumentChunk> getChunks() {
         return chunks;
     }
@@ -218,7 +231,6 @@ public class Document extends BaseEntity {
     public void setChunks(List<DocumentChunk> chunks) {
         this.chunks = chunks;
     }
-
 
     public List<DocumentAccess> getAccessList() {
         return accessList;
@@ -228,7 +240,6 @@ public class Document extends BaseEntity {
         this.accessList = accessList;
     }
 
-
     public DocumentVerification getVerification() {
         return verification;
     }
@@ -236,7 +247,6 @@ public class Document extends BaseEntity {
     public void setVerification(DocumentVerification verification) {
         this.verification = verification;
     }
-
 
     public List<Feedback> getFeedbacks() {
         return feedbacks;

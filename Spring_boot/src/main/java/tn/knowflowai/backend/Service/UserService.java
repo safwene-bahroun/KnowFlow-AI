@@ -1,11 +1,12 @@
 package tn.knowflowai.backend.Service;
 
+import java.io.IOException;
 import java.util.List;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import tn.knowflowai.backend.DTO.ProfileRequest;
+import tn.knowflowai.backend.Service.ImageStorageService;
 import tn.knowflowai.backend.Entity.User;
 import tn.knowflowai.backend.Repository.UserRepository;
 
@@ -15,13 +16,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ImageStorageService imageStorageService;
 
     public UserService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            ImageStorageService imageStorageService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.imageStorageService = imageStorageService;
     }
 
     // CREATE
@@ -143,6 +147,26 @@ public class UserService {
         );
 
         return userRepository.save(user);
+    }
+
+    public User updateProfile(String currentEmail, ProfileRequest request) throws IOException {
+        User user = findByEmail(currentEmail);
+
+        user.setName(request.getName());
+        user.setFamilyName(request.getFamilyName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setAddress(request.getAddress());
+        if (request.getUrlImage() != null && !request.getUrlImage().isBlank()) {
+            user.setUrlImage(imageStorageService.saveBase64Image(request.getUrlImage()));
+        }
+
+        return userRepository.save(user);
+    }
+
+    private User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     // DELETE

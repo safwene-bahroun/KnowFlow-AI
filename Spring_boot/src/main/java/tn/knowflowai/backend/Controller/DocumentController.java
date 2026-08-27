@@ -1,10 +1,13 @@
 package tn.knowflowai.backend.Controller;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,15 +15,22 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import tn.knowflowai.backend.DTO.DocumentRequest;
+import tn.knowflowai.backend.DTO.DocumentResponse;
+import tn.knowflowai.backend.Entity.Department;
 import tn.knowflowai.backend.Entity.Document;
 import tn.knowflowai.backend.Entity.Enum.DocumentStatus;
 import tn.knowflowai.backend.Entity.Enum.DocumentVisibility;
+import tn.knowflowai.backend.Entity.User;
+import tn.knowflowai.backend.Repository.DepartmentRepository;
+import tn.knowflowai.backend.Repository.DocumentRepository;
+import tn.knowflowai.backend.Repository.UserRepository;
 import tn.knowflowai.backend.Service.DocumentService;
+import tn.knowflowai.backend.Service.FileStorageService;
 
 @RestController
 @RequestMapping("/api/admin/documents")
@@ -29,9 +39,22 @@ import tn.knowflowai.backend.Service.DocumentService;
 public class DocumentController {
 
     private final DocumentService documentService;
+        private final DocumentRepository documentRepository;
+        private final DepartmentRepository departmentRepository;
+        private final UserRepository userRepository;
+        private final FileStorageService fileStorageService;
 
-    public DocumentController(DocumentService documentService) {
+        public DocumentController(
+                        DocumentService documentService,
+                        DocumentRepository documentRepository,
+                        DepartmentRepository departmentRepository,
+                        UserRepository userRepository,
+                        FileStorageService fileStorageService) {
         this.documentService = documentService;
+                this.documentRepository = documentRepository;
+                this.departmentRepository = departmentRepository;
+                this.userRepository = userRepository;
+                this.fileStorageService = fileStorageService;
     }
 
     // ==========================================
@@ -39,16 +62,28 @@ public class DocumentController {
     // POST /api/documents
     // ==========================================
 
-    @PostMapping
-    public ResponseEntity<Document> create(
-            @RequestBody Document document) {
+    @PostMapping(
+                        consumes = "application/json")
+    public ResponseEntity<Document> createDocument(
+                        @org.springframework.web.bind.annotation.RequestBody DocumentRequest request,
+            Authentication authentication) throws IOException {
 
-        Document createdDocument =
-                documentService.create(document);
+        Document document = new Document();
+                document.setName(request.getName());
+                document.setDescription(request.getDescription());
+                document.setAuthor(request.getAuthor());
+                document.setStatus(request.getStatus());
+                document.setVisibility(request.getVisibility());
+                document.setDepartment(resolveDepartment(request.getDepartmentId()));
+        document.setCreatedBy(findUser(authentication));
+                byte[] fileData = decodeFile(request.getFileData());
+                document.setUrl(fileStorageService.store(fileData, request.getFileName()));
+                document.setMimeType(request.getMimeType());
+                document.setFileSize(request.getFileSize() != null ? request.getFileSize() : (long) fileData.length);
+        normalizeVisibility(document);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(createdDocument);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(documentRepository.save(document));
     }
 
     // ==========================================
@@ -57,10 +92,10 @@ public class DocumentController {
     // ==========================================
 
     @GetMapping
-    public ResponseEntity<List<Document>> getAll() {
+        public ResponseEntity<List<DocumentResponse>> getAll() {
 
         return ResponseEntity.ok(
-                documentService.getAll()
+                responses(documentService.getAll())
         );
     }
 
@@ -70,11 +105,11 @@ public class DocumentController {
     // ==========================================
 
     @GetMapping("/{id}")
-    public ResponseEntity<Document> getById(
+        public ResponseEntity<DocumentResponse> getById(
             @PathVariable Long id) {
 
         return ResponseEntity.ok(
-                documentService.getById(id)
+                DocumentResponse.from(documentService.getById(id))
         );
     }
 
@@ -84,11 +119,11 @@ public class DocumentController {
     // ==========================================
 
     @GetMapping("/search")
-    public ResponseEntity<List<Document>> search(
+        public ResponseEntity<List<DocumentResponse>> search(
             @RequestParam String keyword) {
 
         return ResponseEntity.ok(
-                documentService.search(keyword)
+                responses(documentService.search(keyword))
         );
     }
 
@@ -98,11 +133,11 @@ public class DocumentController {
     // ==========================================
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<List<Document>> getByName(
+        public ResponseEntity<List<DocumentResponse>> getByName(
             @PathVariable String name) {
 
         return ResponseEntity.ok(
-                documentService.getByName(name)
+                responses(documentService.getByName(name))
         );
     }
 
@@ -112,13 +147,13 @@ public class DocumentController {
     // ==========================================
 
     @GetMapping("/department/{departmentId}")
-    public ResponseEntity<List<Document>>
+        public ResponseEntity<List<DocumentResponse>>
     getDocumentsByDepartment(
             @PathVariable Long departmentId) {
 
         return ResponseEntity.ok(
-                documentService
-                        .getDocumentsByDepartment(departmentId)
+                responses(documentService
+                        .getDocumentsByDepartment(departmentId))
         );
     }
 
@@ -128,11 +163,11 @@ public class DocumentController {
     // ==========================================
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Document>> getByStatus(
+        public ResponseEntity<List<DocumentResponse>> getByStatus(
             @PathVariable DocumentStatus status) {
 
         return ResponseEntity.ok(
-                documentService.getByStatus(status)
+                responses(documentService.getByStatus(status))
         );
     }
 
@@ -142,11 +177,11 @@ public class DocumentController {
     // ==========================================
 
     @GetMapping("/visibility/{visibility}")
-    public ResponseEntity<List<Document>> getByVisibility(
+        public ResponseEntity<List<DocumentResponse>> getByVisibility(
             @PathVariable DocumentVisibility visibility) {
 
         return ResponseEntity.ok(
-                documentService.getByVisibility(visibility)
+                responses(documentService.getByVisibility(visibility))
         );
     }
 
@@ -155,15 +190,70 @@ public class DocumentController {
     // PUT /api/documents/{id}
     // ==========================================
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Document> update(
+                @PutMapping(value = "/{id}", consumes = "application/json")
+        public ResponseEntity<Document> updateDocument(
             @PathVariable Long id,
-            @RequestBody Document document) {
+                                                @org.springframework.web.bind.annotation.RequestBody DocumentRequest request)
+                        throws IOException {
 
-        return ResponseEntity.ok(
-                documentService.update(id, document)
-        );
+                Document document = documentRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Document not found"));
+                document.setName(request.getName());
+                document.setDescription(request.getDescription());
+                document.setAuthor(request.getAuthor());
+                document.setStatus(request.getStatus());
+                document.setVisibility(request.getVisibility());
+                document.setDepartment(resolveDepartment(request.getDepartmentId()));
+                normalizeVisibility(document);
+
+                if (request.getFileData() != null && !request.getFileData().isBlank()) {
+                        byte[] fileData = decodeFile(request.getFileData());
+                        document.setUrl(fileStorageService.store(fileData, request.getFileName()));
+                        document.setMimeType(request.getMimeType());
+                        document.setFileSize(request.getFileSize() != null ? request.getFileSize() : (long) fileData.length);
+                }
+
+                return ResponseEntity.ok(documentRepository.save(document));
     }
+
+        private List<DocumentResponse> responses(List<Document> documents) {
+                return documents.stream()
+                                .map(DocumentResponse::from)
+                                .toList();
+        }
+
+        private Department resolveDepartment(Long departmentId) {
+                if (departmentId == null) {
+                        return null;
+                }
+                return departmentRepository.findById(departmentId)
+                                .orElseThrow(() -> new RuntimeException("Department not found"));
+        }
+
+        private User findUser(Authentication authentication) {
+                return userRepository.findByEmail(authentication.getName())
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+        }
+
+        private byte[] decodeFile(String fileData) {
+                if (fileData == null || fileData.isBlank()) {
+                        throw new IllegalArgumentException("File is required");
+                }
+                return Base64.getDecoder().decode(fileData);
+        }
+
+        private void normalizeVisibility(Document document) {
+                if (document.getVisibility() == null) {
+                        throw new IllegalArgumentException("Visibility is required");
+                }
+                if (document.getVisibility() == DocumentVisibility.DEPARTMENT &&
+                                document.getDepartment() == null) {
+                        document.setVisibility(DocumentVisibility.PRIVATE);
+                }
+                if (document.getVisibility() != DocumentVisibility.DEPARTMENT) {
+                        document.setDepartment(null);
+                }
+        }
 
     // ==========================================
     // UPDATE STATUS
@@ -191,12 +281,14 @@ public class DocumentController {
     @PatchMapping("/{id}/visibility")
     public ResponseEntity<Document> updateVisibility(
             @PathVariable Long id,
-            @RequestParam DocumentVisibility visibility) {
+            @RequestParam DocumentVisibility visibility,
+            @RequestParam(required = false) Long departmentId) {
 
         return ResponseEntity.ok(
                 documentService.updateVisibility(
                         id,
-                        visibility
+                        visibility,
+                        departmentId
                 )
         );
     }

@@ -114,14 +114,10 @@ export class ResetPassword{
     this.successMessage = '';
 
 
-    this.authService
-      .resetPassword({
-
-        token: this.token,
-
-        password: password
-
-      })
+    this.authService.resetPassword({
+  token: this.token,
+  newPassword: password  // ✅ était "password"
+})
       .subscribe({
 
         next: () => {

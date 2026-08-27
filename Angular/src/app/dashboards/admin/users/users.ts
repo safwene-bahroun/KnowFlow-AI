@@ -118,7 +118,16 @@ export class Users implements OnInit {
 
   getUserImage(user: UserRecord): string | null {
     const image = user?.urlImage ?? user?.imageUrl ?? user?.photo ?? user?.profileImage ?? null;
-    return image && image.trim() ? image : null;
+    if (!image || !image.trim()) return null;
+    return /^https?:\/\//i.test(image)
+      ? image
+      : `http://localhost:3000${image.startsWith('/') ? '' : '/'}${image}`;
+  }
+
+  onImageError(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    image.style.display = 'none';
+    image.nextElementSibling?.removeAttribute('hidden');
   }
 
   getDepartmentName(user: UserRecord): string {

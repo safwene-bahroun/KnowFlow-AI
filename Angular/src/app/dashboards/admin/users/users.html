@@ -57,8 +57,11 @@
         <tr *ngFor="let user of users">
           <td>{{ user.id }}</td>
           <td>
-            <img *ngIf="getUserImage(user) as avatarUrl" [src]="avatarUrl" alt="avatar" class="avatar" />
-            <span *ngIf="!getUserImage(user)">-</span>
+            <ng-container *ngIf="getUserImage(user) as avatarUrl; else noAvatar">
+              <img [src]="avatarUrl" alt="avatar" class="avatar" (error)="onImageError($event)" />
+              <span hidden>-</span>
+            </ng-container>
+            <ng-template #noAvatar>-</ng-template>
           </td>
           <td>{{ user.name }} {{ user.familyName }}</td>
           <td>{{ user.email }}</td>

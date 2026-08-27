@@ -2,579 +2,235 @@
 
   <h2>Documents</h2>
 
+  <!-- CURRENT USER BANNER -->
+  <div class="current-user-banner" *ngIf="currentUser">
+    Logged in as: <strong>{{ currentUserLabel }}</strong>
+    <span class="user-role">({{ currentUser.role }})</span>
+  </div>
 
-  <!-- ====================================== -->
   <!-- MESSAGES -->
-  <!-- ====================================== -->
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+  <div *ngIf="errorMessage"   class="error-message">{{ errorMessage }}</div>
 
-  <div
-    *ngIf="successMessage"
-    class="success-message"
-  >
-    {{ successMessage }}
-  </div>
-
-  <div
-    *ngIf="errorMessage"
-    class="error-message"
-  >
-    {{ errorMessage }}
-  </div>
-
-
-  <!-- ====================================== -->
-  <!-- SEARCH AND FILTERS -->
-  <!-- ====================================== -->
-
+  <!-- ===================== SEARCH + FILTERS ===================== -->
   <div class="filters">
 
     <div>
-
       <input
         type="text"
         placeholder="Search documents..."
         [(ngModel)]="searchKeyword"
         (keyup.enter)="searchDocuments()"
       />
-
-      <button
-        type="button"
-        (click)="searchDocuments()"
-      >
-        Search
-      </button>
-
+      <button type="button" (click)="searchDocuments()">Search</button>
     </div>
 
-
-    <!-- DEPARTMENT -->
-
-    <select
-      (change)="
-        filterByDepartment(
-          $any($event.target).value
-            ? +$any($event.target).value
-            : null
-        )
-      "
-    >
-
-      <option value="">
-        All Departments
-      </option>
-
-      <option
-        *ngFor="let department of departments"
-        [value]="department.id"
-      >
-        {{ department.name }}
-      </option>
-
+    <select (change)="filterByDepartment(
+        $any($event.target).value ? +$any($event.target).value : null
+      )">
+      <option value="">All Departments</option>
+      <option *ngFor="let d of departments" [value]="d.id">{{ d.name }}</option>
     </select>
 
-
-    <!-- STATUS -->
-
-    <select
-      (change)="
-        filterByStatus(
-          $any($event.target).value
-        )
-      "
-    >
-
-      <option value="">
-        All Statuses
-      </option>
-
-      <option
-        *ngFor="let status of documentStatuses"
-        [value]="status"
-      >
-        {{ status }}
-      </option>
-
+    <select (change)="filterByStatus($any($event.target).value)">
+      <option value="">All Statuses</option>
+      <option *ngFor="let s of documentStatuses" [value]="s">{{ s }}</option>
     </select>
 
-
-    <!-- VISIBILITY -->
-
-    <select
-      (change)="
-        filterByVisibility(
-          $any($event.target).value
-        )
-      "
-    >
-
-      <option value="">
-        All Visibility
-      </option>
-
-      <option
-        *ngFor="
-          let visibility
-          of documentVisibilities
-        "
-        [value]="visibility"
-      >
-        {{ visibility }}
-      </option>
-
+    <select (change)="filterByVisibility($any($event.target).value)">
+      <option value="">All Visibility</option>
+      <option *ngFor="let v of documentVisibilities" [value]="v">{{ v }}</option>
     </select>
 
-
-    <button
-      type="button"
-      (click)="loadDocuments()"
-    >
-      Reset
-    </button>
-
+    <button type="button" (click)="loadDocuments()">Reset</button>
   </div>
 
-
-  <!-- ====================================== -->
-  <!-- DOCUMENT FORM -->
-  <!-- ====================================== -->
-
+  <!-- ===================== FORM ===================== -->
   <div class="document-form">
+    <h3>{{ isEditing ? 'Edit Document' : 'Add Document' }}</h3>
 
-    <h3>
-      {{
-        isEditing
-          ? 'Edit Document'
-          : 'Add Document'
-      }}
-    </h3>
+    <form [formGroup]="documentForm"
+          (ngSubmit)="isEditing ? updateDocument() : createDocument()">
 
+      <!-- DRAG & DROP -->
+      <div
+        class="drop-zone"
+        [class.drag-over]="isDragOver"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <div *ngIf="!selectedFile" class="drop-placeholder">
+          <p>
+            {{ isEditing
+                ? 'Drop a new file to replace the existing one (optional)'
+                : 'Drag & drop a file here (PDF, Word, TXT…)' }}
+          </p>
+          <label class="file-label">
+            or click to browse
+            <input
+              type="file"
+              hidden
+              accept=".pdf,.doc,.docx,.txt,.rtf,.odt"
+              (change)="onFileSelected($event)"
+            />
+          </label>
+        </div>
 
-    <form
-      [formGroup]="documentForm"
-      (ngSubmit)="
-        isEditing
-          ? updateDocument()
-          : createDocument()
-      "
-    >
-
+        <div *ngIf="selectedFile" class="file-card">
+          <div class="file-icon">📄</div>
+          <div class="file-content">
+            <h4>{{ selectedFile.name }}</h4>
+            <div class="file-meta">
+              <span><strong>Type:</strong> {{ selectedFile.type || 'Unknown' }}</span>
+              <span><strong>Size:</strong> {{ (selectedFile.size / 1024) | number:'1.0-1' }} KB</span>
+            </div>
+          </div>
+          <button type="button" class="remove-btn" (click)="clearFile()">✕</button>
+        </div>
+      </div>
 
       <!-- NAME -->
-
       <div class="form-group">
-
-        <label>
-          Document Name
-        </label>
-
-        <input
-          type="text"
-          formControlName="name"
-        />
-
-        <small
-          *ngIf="
-            nameControl.invalid &&
-            nameControl.touched
-          "
-        >
+        <label>Document Name <span class="required">*</span></label>
+        <input type="text" formControlName="name" />
+        <small *ngIf="nameControl.invalid && nameControl.touched" class="error">
           Document name is required.
         </small>
-
       </div>
-
-
-      <!-- URL -->
-
-      <div class="form-group">
-
-        <label>
-          Document URL
-        </label>
-
-        <input
-          type="text"
-          formControlName="url"
-          placeholder="https://..."
-        />
-
-        <small
-          *ngIf="
-            urlControl.invalid &&
-            urlControl.touched
-          "
-        >
-          URL is required.
-        </small>
-
-      </div>
-
-
-      <!-- MIME TYPE -->
-
-      <div class="form-group">
-
-        <label>
-          MIME Type
-        </label>
-
-        <input
-          type="text"
-          formControlName="mimeType"
-          placeholder="application/pdf"
-        />
-
-      </div>
-
-
-      <!-- FILE SIZE -->
-
-      <div class="form-group">
-
-        <label>
-          File Size (bytes)
-        </label>
-
-        <input
-          type="number"
-          formControlName="fileSize"
-        />
-
-      </div>
-
 
       <!-- DESCRIPTION -->
-
       <div class="form-group">
-
-        <label>
-          Description
-        </label>
-
-        <textarea
-          formControlName="description"
-          rows="4"
-        ></textarea>
-
+        <label>Description</label>
+        <textarea formControlName="description" rows="3"></textarea>
       </div>
-
 
       <!-- AUTHOR -->
-
       <div class="form-group">
-
-        <label>
-          Author
-        </label>
-
-        <input
-          type="text"
-          formControlName="author"
-        />
-
+        <label>Author</label>
+        <input type="text" formControlName="author" />
       </div>
-
-
-      <!-- STATUS -->
-
-      <div class="form-group">
-
-        <label>
-          Status
-        </label>
-
-        <select
-          formControlName="status"
-        >
-
-          <option
-            *ngFor="
-              let status
-              of documentStatuses
-            "
-            [value]="status"
-          >
-            {{ status }}
-          </option>
-
-        </select>
-
-      </div>
-
 
       <!-- VISIBILITY -->
-
       <div class="form-group">
-
-        <label>
-          Visibility
-        </label>
-
-        <select
-          formControlName="visibility"
-        >
-
-          <option
-            *ngFor="
-              let visibility
-              of documentVisibilities
-            "
-            [value]="visibility"
-          >
-            {{ visibility }}
-          </option>
-
+        <label>Visibility</label>
+        <select formControlName="visibility">
+          <option *ngFor="let v of documentVisibilities" [value]="v">{{ v }}</option>
         </select>
-
       </div>
 
-
-      <!-- DEPARTMENT -->
-
-      <div class="form-group">
-
-        <label>
-          Department
-        </label>
-
-        <select
-          formControlName="departmentId"
-        >
-
-          <option [ngValue]="null">
-            No Department
-          </option>
-
-          <option
-            *ngFor="
-              let department
-              of departments
-            "
-            [ngValue]="department.id"
-          >
-            {{ department.name }}
-          </option>
-
+      <!-- DEPARTMENT (shown + required only when Visibility = DEPARTMENT) -->
+      <div class="form-group" *ngIf="isDepartmentRequired">
+        <label>Department <span class="required">*</span></label>
+        <select formControlName="departmentId">
+          <option [ngValue]="null">Select a department</option>
+          <option *ngFor="let d of departments" [ngValue]="d.id">{{ d.name }}</option>
         </select>
-
+        <small
+          *ngIf="documentForm.get('departmentId')?.invalid &&
+                 documentForm.get('departmentId')?.touched"
+          class="error"
+        >
+          Department is required when visibility is DEPARTMENT.
+        </small>
       </div>
 
+      <!-- CREATED BY — read-only, shows the logged-in user (set by backend from JWT) -->
+      <div class="form-group" *ngIf="currentUser">
+        <label>Created By</label>
+        <input type="text" [value]="currentUserLabel" disabled />
+      </div>
 
-      <!-- BUTTONS -->
+      <!-- ACTIONS -->
+      <div class="form-actions">
+        <button type="submit" [disabled]="documentForm.invalid || (!isEditing && !selectedFile)">
+          {{ isEditing ? 'Update' : 'Create' }}
+        </button>
 
-      <button
-        type="submit"
-        [disabled]="documentForm.invalid"
-      >
-        {{
-          isEditing
-            ? 'Update'
-            : 'Create'
-        }}
-      </button>
-
-
-      <button
-        *ngIf="isEditing"
-        type="button"
-        (click)="resetForm()"
-      >
-        Cancel
-      </button>
-
+        <button
+          *ngIf="isEditing"
+          type="button"
+          class="btn-secondary"
+          (click)="resetForm()"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
-
   </div>
 
-
-  <!-- ====================================== -->
-  <!-- DOCUMENT LIST -->
-  <!-- ====================================== -->
-
+  <!-- ===================== TABLE ===================== -->
   <div class="document-list">
+    <h3>Document List</h3>
 
-    <h3>
-      Document List
-    </h3>
+    <div *ngIf="isLoading">Loading documents…</div>
 
+    <div class="table-wrapper" *ngIf="!isLoading && documents.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>File URL</th>
+            <th>Author</th>
+            <th>Created By</th>
+            <th>MIME Type</th>
+            <th>File Size</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Visibility</th>
+            <th>Department</th>
+            <th>Created At</th>
+            <th>Modified At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-    <div *ngIf="isLoading">
-      Loading documents...
+        <tbody>
+          <tr *ngFor="let doc of documents">
+            <td>{{ doc.id }}</td>
+            <td>{{ doc.name }}</td>
+            <td>
+              <a *ngIf="doc.url" [href]="getDocumentUrl(doc.url)" target="_blank" rel="noopener noreferrer">
+                Open file
+              </a>
+              <span *ngIf="!doc.url">-</span>
+            </td>
+            <td>{{ doc.author || '-' }}</td>
+
+            <!--
+              createdBy is set by the backend from Authentication.getName()
+              (the JWT email that authInterceptor sends).
+              We only display what the backend returns in the response.
+            -->
+            <td>
+              {{ getCreatedByLabel(doc) }}
+            </td>
+
+            <td>{{ doc.mimeType || '-' }}</td>
+            <td>
+              {{ doc.fileSize
+                  ? (doc.fileSize / 1024 | number:'1.0-1') + ' KB'
+                  : '-' }}
+            </td>
+            <td class="description-cell">{{ doc.description || '-' }}</td>
+            <td><span class="status-badge">{{ doc.status }}</span></td>
+            <td>{{ doc.visibility }}</td>
+            <td>{{ doc.department?.name || '-' }}</td>
+            <td>{{ doc.createdAt  ? (doc.createdAt  | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+            <td>{{ doc.modifiedAt ? (doc.modifiedAt | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+
+            <td class="actions">
+              <button type="button" (click)="editDocument(doc)">Edit</button>
+              <button type="button" (click)="deleteDocument(doc.id)">Delete</button>
+              <a [href]="getDocumentUrl(doc.url)" target="_blank" rel="noopener noreferrer">Open</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-
-    <table
-      *ngIf="
-        !isLoading &&
-        documents.length > 0
-      "
-    >
-
-      <thead>
-
-        <tr>
-
-          <th>ID</th>
-
-          <th>Name</th>
-
-          <th>Author</th>
-
-          <th>Department</th>
-
-          <th>Status</th>
-
-          <th>Visibility</th>
-
-          <th>Actions</th>
-
-        </tr>
-
-      </thead>
-
-
-      <tbody>
-
-        <tr
-          *ngFor="
-            let document
-            of documents
-          "
-        >
-
-          <td>
-            {{ document.id }}
-          </td>
-
-
-          <td>
-            {{ document.name }}
-          </td>
-
-
-          <td>
-            {{ document.author || '-' }}
-          </td>
-
-
-          <td>
-            {{
-              document.department?.name
-                || '-'
-            }}
-          </td>
-
-
-          <!-- STATUS -->
-
-          <td>
-
-            <select
-              [ngModel]="document.status"
-              (ngModelChange)="
-                changeStatus(
-                  document,
-                  $event
-                )
-              "
-            >
-
-              <option
-                *ngFor="
-                  let status
-                  of documentStatuses
-                "
-                [ngValue]="status"
-              >
-                {{ status }}
-              </option>
-
-            </select>
-
-          </td>
-
-
-          <!-- VISIBILITY -->
-
-          <td>
-
-            <select
-              [ngModel]="document.visibility"
-              (ngModelChange)="
-                changeVisibility(
-                  document,
-                  $event
-                )
-              "
-            >
-
-              <option
-                *ngFor="
-                  let visibility
-                  of documentVisibilities
-                "
-                [ngValue]="visibility"
-              >
-                {{ visibility }}
-              </option>
-
-            </select>
-
-          </td>
-
-
-          <!-- ACTIONS -->
-
-          <td>
-
-            <button
-              type="button"
-              (click)="
-                editDocument(document)
-              "
-            >
-              Edit
-            </button>
-
-
-            <button
-              type="button"
-              (click)="
-                deleteDocument(
-                  document.id
-                )
-              "
-            >
-              Delete
-            </button>
-
-
-            <a
-              [href]="document.url"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open
-            </a>
-
-          </td>
-
-        </tr>
-
-      </tbody>
-
-    </table>
-
-
-    <p
-      *ngIf="
-        !isLoading &&
-        documents.length === 0
-      "
-    >
-      No documents found.
-    </p>
-
+    <p *ngIf="!isLoading && documents.length === 0">No documents found.</p>
   </div>
 
 </div>

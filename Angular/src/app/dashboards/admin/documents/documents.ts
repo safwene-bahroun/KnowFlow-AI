@@ -2,868 +2,502 @@ import {
   ChangeDetectorRef,
   Component,
   OnInit,
+  OnDestroy,
   inject
 } from '@angular/core';
 
-import {
-  CommonModule
-} from '@angular/common';
-
+import { CommonModule } from '@angular/common';
 import {
   FormsModule,
   ReactiveFormsModule,
   FormBuilder,
   Validators
 } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
-import {
-  ActivatedRoute,
-  Router
-} from '@angular/router';
-
-import {
-  DocumentService
-} from '../../../Services/document-service';
-
-import {
-  DepartmentService
-} from '../../../Services/department-service';
+import { DocumentRequest, DocumentService } from '../../../Services/document-service';
+import { DepartmentService }         from '../../../Services/department-service';
+import { AuthService, UserResponse } from '../../../Services/auth-service';
+import { UserService, User as ApiUser } from '../../../Services/user-service';
 
 import {
   Document,
   DocumentStatus,
   DocumentVisibility
 } from '../Models/Document';
-
-import {
-  Department
-} from '../Models/Departments';
-
+import { Department } from '../Models/Departments';
 
 @Component({
-  selector: 'app-document',
-
+  selector: 'app-documents',
   standalone: true,
-
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule
-  ],
-
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './documents.html',
-
-  styleUrl: './documents.css'
+  styleUrl:    './documents.css'
 })
-export class Documents
-  implements OnInit {
+export class Documents implements OnInit, OnDestroy {
 
+  // ── DI ──────────────────────────────────────────────────────────────────────
+  private readonly documentService   = inject(DocumentService);
+  private readonly departmentService = inject(DepartmentService);
+  private readonly authService       = inject(AuthService);
+  private readonly userService       = inject(UserService);
+  private readonly fb                = inject(FormBuilder);
+  private readonly cdr               = inject(ChangeDetectorRef);
+  private readonly route             = inject(ActivatedRoute);
+  private readonly router            = inject(Router);
 
-  private readonly documentService =
-    inject(DocumentService);
-
-  private readonly departmentService =
-    inject(DepartmentService);
-
-  private readonly fb =
-    inject(FormBuilder);
-  private readonly changeDetector =
-    inject(ChangeDetectorRef);
-
-  private readonly route =
-    inject(ActivatedRoute);
-
-  private readonly router =
-    inject(Router);
-
-
-  // ==========================================
-  // DATA
-  // ==========================================
-
-  documents: Document[] = [];
-
-  departments: Department[] = [];
-
+  // ── State ────────────────────────────────────────────────────────────────────
+  documents:        Document[]   = [];
+  departments:      Department[] = [];
+  users:             ApiUser[] = [];
   selectedDocument: Document | null = null;
 
+  /**
+   * Read from localStorage (set by AuthService on login).
+   * Used for display only — authInterceptor sends the JWT on every request
+   * so the backend can resolve createdBy automatically.
+   */
+  currentUser: UserResponse | null = null;
 
-  // ==========================================
-  // ENUMS
-  // ==========================================
+  readonly documentStatuses     = Object.values(DocumentStatus);
+  readonly documentVisibilities = Object.values(DocumentVisibility);
 
-  readonly documentStatuses =
-    Object.values(DocumentStatus);
-
-  readonly documentVisibilities =
-    Object.values(DocumentVisibility);
-
-
-  // ==========================================
-  // STATE
-  // ==========================================
-
-  isEditing = false;
-
-  isLoading = false;
-
-  errorMessage = '';
-
+  isEditing      = false;
+  isLoading      = false;
+  errorMessage   = '';
   successMessage = '';
+  searchKeyword  = '';
 
-  searchKeyword = '';
+  isDragOver   = false;
+  selectedFile: File | null = null;
 
+  private routeSub?: Subscription;
 
-  // ==========================================
-  // FORM
-  // ==========================================
+  // ── Form ─────────────────────────────────────────────────────────────────────
+  documentForm = this.fb.nonNullable.group({
+    name:         ['', [Validators.required, Validators.maxLength(255)]],
+    description:  ['', Validators.maxLength(500)],
+    author:       ['', Validators.maxLength(255)],
+    status:       [DocumentStatus.UPLOADED,    Validators.required],
+    visibility:   [DocumentVisibility.PRIVATE, Validators.required],
+    departmentId: [null as number | null]
+  });
 
-  documentForm =
-    this.fb.nonNullable.group({
+  // ── Computed ─────────────────────────────────────────────────────────────────
+  get isDepartmentRequired(): boolean {
+    return this.documentForm.get('visibility')?.value === DocumentVisibility.DEPARTMENT;
+  }
 
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(255)
-        ]
-      ],
+  get nameControl() { return this.documentForm.controls.name; }
 
-      url: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(500)
-        ]
-      ],
+  get currentUserLabel(): string {
+    if (!this.currentUser) return '-';
+    const full = `${this.currentUser.name ?? ''} ${this.currentUser.familyName ?? ''}`.trim();
+    return full || this.currentUser.email || '-';
+  }
 
-      mimeType: [
-        ''
-      ],
+  getDocumentUrl(url: string | undefined): string {
+    if (!url) return '';
+    return /^https?:\/\//i.test(url)
+      ? url
+      : `http://localhost:3000${url.startsWith('/') ? '' : '/'}${url}`;
+  }
 
-      fileSize: [
-        0
-      ],
+  getCreatedByLabel(document: Document): string {
+    const createdBy = document.createdBy;
+    const user = createdBy?.id
+      ? this.users.find(item => item.id === createdBy.id)
+      : undefined;
+    const source = user ?? createdBy;
 
-      description: [
-        '',
-        [
-          Validators.maxLength(500)
-        ]
-      ],
+    if (!source) return '-';
 
-      author: [
-        '',
-        [
-          Validators.maxLength(255)
-        ]
-      ],
+    const name = 'name' in source ? source.name : source.firstName;
+    const familyName = 'familyName' in source ? source.familyName : source.lastName;
+    return `${name ?? ''} ${familyName ?? ''}`.trim() || source.email || '-';
+  }
 
-      status: [
-        DocumentStatus.UPLOADED,
-        Validators.required
-      ],
-
-      visibility: [
-        DocumentVisibility.PRIVATE,
-        Validators.required
-      ],
-
-      departmentId: [
-        null as number | null
-      ]
-    });
-
-
-  // ==========================================
-  // INIT
-  // ==========================================
-
+  // ── Lifecycle ────────────────────────────────────────────────────────────────
   ngOnInit(): void {
-
+    this.currentUser = this.authService.getCurrentUser();
     this.loadDepartments();
-
+    this.loadUsers();
     this.loadDocuments();
+    this.listenToRouteParams();
 
-    this.checkEditMode();
+    this.documentForm.get('visibility')?.valueChanges.subscribe(() => {
+      this.onVisibilityChange();
+    });
+    this.onVisibilityChange();
   }
 
+  ngOnDestroy(): void {
+    this.routeSub?.unsubscribe();
+  }
 
-  // ==========================================
-  // CHECK ROUTE MODE
-  // ==========================================
+  // ── Route (observable — survives component reuse) ────────────────────────────
+  private listenToRouteParams(): void {
+    this.routeSub = this.route.data.subscribe(data => {
+      const mode = data['mode'];
+      this.route.paramMap.subscribe(params => {
+        const id = params.get('id');
+        if (mode === 'edit' && id) {
+          this.isEditing = true;
+          this.loadDocument(+id);
+        } else {
+          this.isEditing = false;
+          this.resetForm();
+        }
+      });
+    });
+  }
 
-  private checkEditMode(): void {
+  // ── Visibility → Department validator ────────────────────────────────────────
+  onVisibilityChange(): void {
+    const visibility = this.documentForm.get('visibility')?.value;
+    const deptCtrl   = this.documentForm.get('departmentId');
 
-    const mode =
-      this.route.snapshot.data['mode'];
-
-    const id =
-      this.route.snapshot.paramMap.get('id');
-
-    if (
-      mode === 'edit' &&
-      id
-    ) {
-
-      this.isEditing = true;
-
-      this.loadDocument(
-        Number(id)
-      );
+    if (visibility === DocumentVisibility.DEPARTMENT) {
+      deptCtrl?.setValidators([Validators.required]);
+    } else {
+      deptCtrl?.clearValidators();
+      deptCtrl?.setValue(null);
     }
+    deptCtrl?.updateValueAndValidity();
   }
 
-
-  // ==========================================
-  // LOAD ALL DOCUMENTS
-  // ==========================================
-
+  // ── Load ─────────────────────────────────────────────────────────────────────
   loadDocuments(): void {
-
     this.isLoading = true;
-
     this.clearMessages();
 
-    this.documentService
-      .getAll()
-      .subscribe({
-
-        next: (data) => {
-
-          this.documents = data;
-
-          this.isLoading = false;
-          this.changeDetector.markForCheck();
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            'Unable to load documents.';
-
-          this.isLoading = false;
-          this.changeDetector.markForCheck();
-        }
-      });
+    this.documentService.getAll().subscribe({
+      next: (data) => {
+        this.documents = data;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.errorMessage =
+          err?.error?.message ?? err?.message ?? 'Unable to load documents.';
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
-
-
-  // ==========================================
-  // LOAD DEPARTMENTS
-  // ==========================================
 
   loadDepartments(): void {
-
-    this.departmentService
-      .getAll()
-      .subscribe({
-
-        next: (data) => {
-
-          this.departments = data;
-          this.changeDetector.markForCheck();
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            'Unable to load departments.';
-
-          this.changeDetector.markForCheck();
-        }
-      });
+    this.departmentService.getAll().subscribe({
+      next: (data) => {
+        this.departments = data;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.errorMessage = 'Unable to load departments.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
+  loadUsers(): void {
+    this.userService.getAll().subscribe({
+      next: users => {
+        this.users = users;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.errorMessage = 'Unable to load users.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
 
-  // ==========================================
-  // LOAD DOCUMENT BY ID
-  // ==========================================
+  loadDocument(id: number): void {
+    this.isLoading = true;
+    this.documentService.getById(id).subscribe({
+      next: (doc) => {
+        this.selectedDocument = doc;
+        this.documentForm.patchValue({
+          name:         doc.name,
+          description:  doc.description  ?? '',
+          author:       doc.author       ?? '',
+          status:       doc.status,
+          visibility:   doc.visibility,
+          departmentId: doc.department?.id ?? null
+        });
+        this.onVisibilityChange();
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.errorMessage =
+          err?.error?.message ?? 'Unable to load document.';
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
 
-  loadDocument(
-    id: number
-  ): void {
+  // ── CRUD ─────────────────────────────────────────────────────────────────────
+
+  /** Sends the selected file and document fields as multipart/form-data. */
+  async createDocument(): Promise<void> {
+    if (this.documentForm.invalid || !this.selectedFile) {
+      this.documentForm.markAllAsTouched();
+      return;
+    }
+
+    this.documentService.create(await this.buildJsonPayload()).subscribe({
+      next: (created) => {
+        this.successMessage = 'Document created successfully.';
+        this.documents.push(created);
+        this.resetForm();
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.errorMessage =
+          err?.error?.message ?? 'Unable to create document.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  editDocument(doc: Document): void {
+    if (!doc.id) return;
+    this.router.navigate(['/admin/documents/edit', doc.id]);
+  }
+
+  async updateDocument(): Promise<void> {
+    if (!this.selectedDocument?.id || this.documentForm.invalid) {
+      this.documentForm.markAllAsTouched();
+      return;
+    }
+
+    this.documentService.update(this.selectedDocument.id, await this.buildJsonPayload()).subscribe({
+      next: (updated) => {
+        const idx = this.documents.findIndex(d => d.id === updated.id);
+        if (idx !== -1) this.documents[idx] = updated;
+        this.successMessage = 'Document updated successfully.';
+        this.resetForm();
+        this.router.navigate(['/admin/documents']);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.errorMessage =
+          err?.error?.message ?? 'Unable to update document.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  deleteDocument(id: number | undefined): void {
+    if (!id) return;
+    if (!confirm('Are you sure you want to delete this document?')) return;
+
+    this.documentService.delete(id).subscribe({
+      next: () => {
+        this.documents = this.documents.filter(d => d.id !== id);
+        this.successMessage = 'Document deleted successfully.';
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.errorMessage =
+          err?.error?.message ?? 'Unable to delete document.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // ── Filters ──────────────────────────────────────────────────────────────────
+  searchDocuments(): void {
+    const keyword = this.searchKeyword.trim();
+    if (!keyword) { this.loadDocuments(); return; }
 
     this.isLoading = true;
-
-    this.documentService
-      .getById(id)
-      .subscribe({
-
-        next: (document) => {
-
-          this.selectedDocument =
-            document;
-
-          this.documentForm.patchValue({
-
-            name: document.name,
-
-            url: document.url,
-
-            mimeType:
-              document.mimeType ?? '',
-
-            fileSize:
-              document.fileSize ?? 0,
-
-            description:
-              document.description ?? '',
-
-            author:
-              document.author ?? '',
-
-            status:
-              document.status,
-
-            visibility:
-              document.visibility,
-
-            departmentId:
-              document.department?.id ?? null
-          });
-
-          this.isLoading = false;
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            'Unable to load document.';
-
-          this.isLoading = false;
-        }
-      });
+    this.clearMessages();
+    this.documentService.search(keyword).subscribe({
+      next: (data) => {
+        this.documents = data;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.documents = [];
+        this.isLoading = false;
+        this.errorMessage = 'Unable to search documents.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
+  filterByDepartment(departmentId: number | null): void {
+    if (!departmentId) { this.loadDocuments(); return; }
 
-  // ==========================================
-  // CREATE
-  // ==========================================
-
-  createDocument(): void {
-
-    if (
-      this.documentForm.invalid
-    ) {
-
-      this.documentForm
-        .markAllAsTouched();
-
-      return;
-    }
-
-    const document =
-      this.buildDocument();
-
-    this.documentService
-      .create(document)
-      .subscribe({
-
-        next: (created) => {
-
-          this.successMessage =
-            'Document created successfully.';
-
-          this.documents.push(created);
-
-          this.resetForm();
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            error?.error?.message ??
-            'Unable to create document.';
-        }
-      });
+    this.isLoading = true;
+    this.clearMessages();
+    this.documentService.getByDepartment(departmentId).subscribe({
+      next: (data) => {
+        this.documents = data;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.documents = [];
+        this.isLoading = false;
+        this.errorMessage = 'Unable to filter documents.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
+  filterByStatus(status: DocumentStatus | ''): void {
+    if (!status) { this.loadDocuments(); return; }
 
-  // ==========================================
-  // EDIT
-  // ==========================================
-
-  editDocument(
-    document: Document
-  ): void {
-
-    if (!document.id) {
-      return;
-    }
-
-    this.router.navigate([
-      '/admin/documents/edit',
-      document.id
-    ]);
+    this.isLoading = true;
+    this.clearMessages();
+    this.documentService.getByStatus(status).subscribe({
+      next: (data) => {
+        this.documents = data;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.documents = [];
+        this.isLoading = false;
+        this.errorMessage = 'Unable to filter documents.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
+  filterByVisibility(visibility: DocumentVisibility | ''): void {
+    if (!visibility) { this.loadDocuments(); return; }
 
-  // ==========================================
-  // UPDATE
-  // ==========================================
-
-  updateDocument(): void {
-
-    if (
-      !this.selectedDocument?.id
-    ) {
-      return;
-    }
-
-    if (
-      this.documentForm.invalid
-    ) {
-
-      this.documentForm
-        .markAllAsTouched();
-
-      return;
-    }
-
-    const document =
-      this.buildDocument();
-
-    this.documentService
-      .update(
-        this.selectedDocument.id,
-        document
-      )
-      .subscribe({
-
-        next: (updated) => {
-
-          const index =
-            this.documents.findIndex(
-              d =>
-                d.id === updated.id
-            );
-
-          if (index !== -1) {
-
-            this.documents[index] =
-              updated;
-          }
-
-          this.successMessage =
-            'Document updated successfully.';
-
-          this.resetForm();
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            error?.error?.message ??
-            'Unable to update document.';
-        }
-      });
+    this.isLoading = true;
+    this.clearMessages();
+    this.documentService.getByVisibility(visibility).subscribe({
+      next: (data) => {
+        this.documents = data;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.documents = [];
+        this.isLoading = false;
+        this.errorMessage = 'Unable to filter documents.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
-
-  // ==========================================
-  // DELETE
-  // ==========================================
-
-  deleteDocument(
-    id: number | undefined
-  ): void {
-
-    if (!id) {
-      return;
-    }
-
-    const confirmed =
-      confirm(
-        'Are you sure you want to delete this document?'
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    this.documentService
-      .delete(id)
-      .subscribe({
-
-        next: () => {
-
-          this.documents =
-            this.documents.filter(
-              d =>
-                d.id !== id
-            );
-
-          this.successMessage =
-            'Document deleted successfully.';
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            error?.error?.message ??
-            'Unable to delete document.';
-        }
-      });
-  }
-
-
-  // ==========================================
-  // SEARCH
-  // ==========================================
-
-  searchDocuments(): void {
-
-    const keyword =
-      this.searchKeyword.trim();
-
-    if (!keyword) {
-
-      this.loadDocuments();
-
-      return;
-    }
-
-    this.documentService
-      .search(keyword)
-      .subscribe({
-
-        next: (data) => {
-
-          this.documents = data;
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            'Unable to search documents.';
-        }
-      });
-  }
-
-
-  // ==========================================
-  // FILTER BY DEPARTMENT
-  // ==========================================
-
-  filterByDepartment(
-    departmentId: number | null
-  ): void {
-
-    if (!departmentId) {
-
-      this.loadDocuments();
-
-      return;
-    }
-
-    this.documentService
-      .getByDepartment(departmentId)
-      .subscribe({
-
-        next: (data) => {
-
-          this.documents = data;
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            'Unable to filter documents.';
-        }
-      });
-  }
-
-
-  // ==========================================
-  // FILTER BY STATUS
-  // ==========================================
-
-  filterByStatus(
-    status: DocumentStatus | ''
-  ): void {
-
-    if (!status) {
-
-      this.loadDocuments();
-
-      return;
-    }
-
-    this.documentService
-      .getByStatus(status)
-      .subscribe({
-
-        next: (data) => {
-
-          this.documents = data;
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            'Unable to filter documents.';
-        }
-      });
-  }
-
-
-  // ==========================================
-  // FILTER BY VISIBILITY
-  // ==========================================
-
-  filterByVisibility(
-    visibility: DocumentVisibility | ''
-  ): void {
-
-    if (!visibility) {
-
-      this.loadDocuments();
-
-      return;
-    }
-
-    this.documentService
-      .getByVisibility(visibility)
-      .subscribe({
-
-        next: (data) => {
-
-          this.documents = data;
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            'Unable to filter documents.';
-        }
-      });
-  }
-
-
-  // ==========================================
-  // UPDATE STATUS
-  // ==========================================
-
-  changeStatus(
-    document: Document,
-    status: DocumentStatus
-  ): void {
-
-    if (!document.id) {
-      return;
-    }
-
-    this.documentService
-      .updateStatus(
-        document.id,
-        status
-      )
-      .subscribe({
-
-        next: (updated) => {
-
-          const index =
-            this.documents.findIndex(
-              d =>
-                d.id === updated.id
-            );
-
-          if (index !== -1) {
-
-            this.documents[index] =
-              updated;
-          }
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            'Unable to update status.';
-        }
-      });
-  }
-
-
-  // ==========================================
-  // UPDATE VISIBILITY
-  // ==========================================
-
-  changeVisibility(
-    document: Document,
-    visibility: DocumentVisibility
-  ): void {
-
-    if (!document.id) {
-      return;
-    }
-
-    this.documentService
-      .updateVisibility(
-        document.id,
-        visibility
-      )
-      .subscribe({
-
-        next: (updated) => {
-
-          const index =
-            this.documents.findIndex(
-              d =>
-                d.id === updated.id
-            );
-
-          if (index !== -1) {
-
-            this.documents[index] =
-              updated;
-          }
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.errorMessage =
-            'Unable to update visibility.';
-        }
-      });
-  }
-
-
-  // ==========================================
-  // BUILD DOCUMENT
-  // ==========================================
-
-  private buildDocument(): Document {
-
-    const value =
-      this.documentForm.getRawValue();
-
-    const document: Document = {
-
-      name: value.name,
-
-      url: value.url,
-
-      mimeType:
-        value.mimeType || undefined,
-
-      fileSize:
-        value.fileSize || undefined,
-
-      description:
-        value.description || undefined,
-
-      author:
-        value.author || undefined,
-
-      status:
-        value.status,
-
-      visibility:
-        value.visibility
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  private async buildJsonPayload(): Promise<DocumentRequest> {
+    const v = this.documentForm.getRawValue();
+    const payload: DocumentRequest = {
+      name: v.name,
+      description: v.description,
+      author: v.author,
+      status: v.status,
+      visibility: v.visibility,
+      departmentId: v.departmentId
     };
 
-    if (value.departmentId) {
-
-      document.department = {
-
-        id: value.departmentId,
-
-        name: ''
-      };
+    if (this.selectedFile) {
+      payload.fileName = this.selectedFile.name;
+      payload.mimeType = this.selectedFile.type || 'application/octet-stream';
+      payload.fileSize = this.selectedFile.size;
+      payload.fileData = await this.fileToBase64(this.selectedFile);
     }
 
-    return document;
+    return payload;
   }
 
-
-  // ==========================================
-  // RESET
-  // ==========================================
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(',')[1]);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  }
 
   resetForm(): void {
-
     this.documentForm.reset({
-
-      name: '',
-
-      url: '',
-
-      mimeType: '',
-
-      fileSize: 0,
-
-      description: '',
-
-      author: '',
-
-      status:
-        DocumentStatus.UPLOADED,
-
-      visibility:
-        DocumentVisibility.PRIVATE,
-
+      name:         '',
+      description:  '',
+      author:       '',
+      status:       DocumentStatus.UPLOADED,
+      visibility:   DocumentVisibility.PRIVATE,
       departmentId: null
     });
-
     this.selectedDocument = null;
-
-    this.isEditing = false;
+    this.isEditing        = false;
+    this.clearFile();
+    this.onVisibilityChange();
   }
 
-
-  // ==========================================
-  // CLEAR MESSAGES
-  // ==========================================
-
   private clearMessages(): void {
-
-    this.errorMessage = '';
-
+    this.errorMessage   = '';
     this.successMessage = '';
   }
 
-
-  // ==========================================
-  // FORM CONTROLS
-  // ==========================================
-
-  get nameControl() {
-
-    return this.documentForm.controls.name;
+  // ── Drag & Drop ─────────────────────────────────────────────────────────────
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = true;
   }
 
-  get urlControl() {
-
-    return this.documentForm.controls.url;
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
   }
 
-  get descriptionControl() {
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+    const files = event.dataTransfer?.files;
+    if (files?.length) this.handleFile(files[0]);
+  }
 
-    return this.documentForm.controls.description;
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) this.handleFile(input.files[0]);
+  }
+
+  private handleFile(file: File): void {
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/plain',
+      'application/rtf',
+      'application/vnd.oasis.opendocument.text'
+    ];
+    const allowedExt = ['.pdf', '.doc', '.docx', '.txt', '.rtf', '.odt'];
+
+    const ok =
+      allowedTypes.includes(file.type) ||
+      allowedExt.some(ext => file.name.toLowerCase().endsWith(ext));
+
+    if (!ok) {
+      this.errorMessage = 'Only PDF, Word, TXT, RTF or ODT files are allowed.';
+      return;
+    }
+
+    this.selectedFile = file;
+    this.documentForm.patchValue({ name: file.name.replace(/\.[^/.]+$/, '') });
+
+    this.cdr.markForCheck();
+  }
+
+  clearFile(): void {
+    this.selectedFile = null;
+    this.documentForm.patchValue({ name: '' });
+    this.cdr.markForCheck();
   }
 }

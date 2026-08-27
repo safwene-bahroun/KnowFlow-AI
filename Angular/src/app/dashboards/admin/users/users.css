@@ -1,307 +1,699 @@
+/* ================================================
+   USERS PAGE – Capgemini KnowFlow AI Theme
+   ================================================
+   Primary Blue  : #0070AD
+   Deep Navy     : #002E5A
+   Blue Ciel     : #4DA8DA
+   Light Ciel    : #E8F4FD
+   Pale Ciel     : #F4FAFF
+   White         : #FFFFFF
+   Dark Text     : #1B2A4A
+   Muted Text    : #5A6B85
+   Border        : #D6EEFF
+   Success Green : #1A8754
+   Error Red     : #D9534F
+   ================================================ */
+
+
+/* ================================================
+   PAGE ENTER ANIMATION
+   ================================================ */
+
 .users-page,
 .user-form-page {
-  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: page-enter 0.35s ease forwards;
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 
-/* ============================= */
-/* HEADER */
-/* ============================= */
+/* ================================================
+   LIST MODE – Page Header
+   ================================================ */
 
-.page-header,
-.form-header {
+.page-header {
   display: flex;
-
-  justify-content: space-between;
-
   align-items: center;
-
-  margin-bottom: 25px;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-
-.page-header h2,
-.form-header h2 {
+.page-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0070AD;
   margin: 0;
+  letter-spacing: -0.02em;
+}
 
-  font-size: 28px;
+.page-header p {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+  color: #5A6B85;
 }
 
 
-.page-header p,
-.form-header p {
-  margin-top: 5px;
-
-  color: #777;
-}
-
-
-/* ============================= */
-/* BUTTONS */
-/* ============================= */
-
-button {
-  cursor: pointer;
-}
-
-
-.primary-btn {
-  padding: 11px 18px;
-
-  border: none;
-
-  border-radius: 7px;
-
-  font-weight: 600;
-}
-
-
-.edit-btn,
-.delete-btn {
-  padding: 7px 11px;
-
-  margin-right: 5px;
-
-  border: 1px solid #ddd;
-
-  border-radius: 5px;
-
-  background: white;
-}
-
-
-.delete-btn {
-  margin-right: 0;
-}
-
-
-/* ============================= */
-/* FILTERS */
-/* ============================= */
+/* ================================================
+   LIST MODE – Filters / Search
+   ================================================ */
 
 .filters {
   display: flex;
-
-  gap: 10px;
-
-  margin-bottom: 25px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #D6EEFF;
+  border-radius: 12px;
 }
-
 
 .search-box {
   display: flex;
-
-  gap: 8px;
-
+  gap: 0.5rem;
   flex: 1;
+  min-width: 220px;
 }
-
 
 .search-box input {
   flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.88rem;
+  color: #1B2A4A;
+  background: #F4FAFF;
+  border: 1.5px solid #D6EEFF;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
 
-  padding: 11px;
+.search-box input:focus {
+  border-color: #0070AD;
+  box-shadow: 0 0 0 3px rgba(0, 112, 173, 0.1);
+  background: #FFFFFF;
+}
 
-  border: 1px solid #ddd;
+.search-box input::placeholder {
+  color: #99B4CC;
+}
 
-  border-radius: 7px;
+.filters select {
+  padding: 0.6rem 2rem 0.6rem 0.8rem;
+  font-size: 0.85rem;
+  color: #1B2A4A;
+  background: #F4FAFF;
+  border: 1.5px solid #D6EEFF;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230070AD' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 12px 8px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.filters select:focus {
+  border-color: #0070AD;
+}
+
+.filters select option {
+  background: #FFFFFF;
 }
 
 
+/* ================================================
+   SHARED – Buttons
+   ================================================ */
+
+.primary-btn,
 .search-box button,
-.filters select,
-.filters > button {
-  padding: 11px 15px;
-
-  border: 1px solid #ddd;
-
-  border-radius: 7px;
-
-  background: white;
-}
-
-
-/* ============================= */
-/* TABLE */
-/* ============================= */
-
-.table-container {
-  overflow-x: auto;
-
-  background: white;
-
-  border-radius: 10px;
-}
-
-
-table {
-  width: 100%;
-
-  border-collapse: collapse;
-}
-
-
-th,
-td {
-  padding: 14px;
-
-  text-align: left;
-
-  border-bottom: 1px solid #eee;
-
-  white-space: nowrap;
-}
-
-
-/* ============================= */
-/* FORM */
-/* ============================= */
-
-.user-form-page {
-  max-width: 1100px;
-}
-
-
-.form-section {
-  padding: 25px;
-
-  margin-bottom: 20px;
-
-  background: white;
-
-  border-radius: 10px;
-}
-
-
-.form-section h3 {
-  margin-top: 0;
-
-  margin-bottom: 20px;
-}
-
-
-.form-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 18px;
-}
-
-
-.form-group {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 7px;
-
-  margin-bottom: 15px;
-}
-
-
-.form-group label {
-  font-size: 14px;
-
-  font-weight: 600;
-}
-
-
-.form-group input,
-.form-group select {
-  padding: 11px;
-
-  border: 1px solid #ddd;
-
-  border-radius: 7px;
-}
-
-
-/* ============================= */
-/* ACTIONS */
-/* ============================= */
-
-.form-actions {
-  display: flex;
-
-  justify-content: flex-end;
-
-  gap: 10px;
-
-  margin-top: 20px;
-}
-
-
+.filters button,
 .form-actions button {
-  padding: 11px 18px;
-
-  border: 1px solid #ddd;
-
-  border-radius: 7px;
-
-  background: white;
-}
-
-
-.form-actions .primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+/* Primary (blue gradient) */
+.primary-btn,
+.search-box button,
+.form-actions button:last-child {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #0070AD 0%, #4DA8DA 100%);
+  box-shadow: 0 2px 8px rgba(0, 112, 173, 0.2);
+}
+
+.primary-btn:hover,
+.search-box button:hover,
+.form-actions button:last-child:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 112, 173, 0.3);
+}
+
+/* Secondary */
+.filters > button,
+.form-actions button:first-child {
+  color: #0070AD;
+  background: #E8F4FD;
+}
+
+.filters > button:hover,
+.form-actions button:first-child:hover {
+  background: #D6EEFF;
+}
+
+.primary-btn:disabled,
+.form-actions button:last-child:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 
-/* ============================= */
-/* STATES */
-/* ============================= */
+/* ================================================
+   ERROR / LOADING / EMPTY
+   ================================================ */
+
+.error {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #D9534F;
+  background: #FFF3F3;
+  border: 1px solid #FACBCB;
+  border-radius: 10px;
+  line-height: 1.45;
+}
+
+.error button {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: #D9534F;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-family: inherit;
+}
+
+.error button:hover {
+  background: #C0392B;
+}
 
 .loading,
 .empty {
-  padding: 50px;
-
   text-align: center;
-
-  color: #777;
+  padding: 2.5rem 1rem;
+  color: #5A6B85;
+  font-size: 0.92rem;
+  font-weight: 500;
 }
 
 
-.empty {
-  background: white;
+/* ================================================
+   TABLE
+   ================================================ */
 
-  border-radius: 10px;
+.table-container {
+  background: #FFFFFF;
+  border: 1px solid #D6EEFF;
+  border-radius: 14px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 1200px;
+}
+
+thead {
+  background: #0070AD;
+}
+
+thead th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid #E8F4FD;
+  transition: background 0.15s ease;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #F4FAFF;
+}
+
+tbody td {
+  padding: 0.7rem 1rem;
+  color: #1B2A4A;
+  vertical-align: middle;
 }
 
 
-.error {
-  padding: 12px;
+/* ---- Avatar ---- */
 
-  margin-bottom: 20px;
-
-  border-radius: 7px;
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #D6EEFF;
 }
 
 
-/* ============================= */
-/* RESPONSIVE */
-/* ============================= */
+/* ---- Enabled / Disabled Badges ---- */
 
-@media (max-width: 800px) {
+.enabled {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1A8754;
+  background: #EEFBF3;
+  border-radius: 20px;
+}
+
+.disabled {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #D9534F;
+  background: #FFF3F3;
+  border-radius: 20px;
+}
+
+
+/* ---- Action Buttons in Table ---- */
+
+td:last-child {
+  white-space: nowrap;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  margin-right: 0.4rem;
+}
+
+.edit-btn {
+  color: #0070AD;
+  background: #E8F4FD;
+}
+
+.edit-btn:hover {
+  background: #D6EEFF;
+}
+
+.delete-btn {
+  color: #D9534F;
+  background: #FFF3F3;
+}
+
+.delete-btn:hover {
+  background: #FACBCB;
+}
+
+
+/* ================================================
+   FORM MODE – Header
+   ================================================ */
+
+.form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.form-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0070AD;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.form-header p {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+  color: #5A6B85;
+}
+
+.form-header button {
+  padding: 0.55rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0070AD;
+  background: #E8F4FD;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-header button:hover {
+  background: #D6EEFF;
+}
+
+
+/* ================================================
+   FORM MODE – Sections
+   ================================================ */
+
+.form-section {
+  background: #FFFFFF;
+  border: 1px solid #D6EEFF;
+  border-radius: 14px;
+  padding: 1.3rem 1.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.form-section h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0070AD;
+  margin: 0 0 0.8rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #E8F4FD;
+}
+
+
+/* ================================================
+   FORM MODE – Grid
+   ================================================ */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 1.2rem;
+}
+
+
+/* ================================================
+   FORM MODE – Groups
+   ================================================ */
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1B2A4A;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="number"],
+.form-group input[type="tel"],
+.form-group select {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.88rem;
+  color: #1B2A4A;
+  background: #F4FAFF;
+  border: 1.5px solid #D6EEFF;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-group input::placeholder {
+  color: #99B4CC;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #0070AD;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(0, 112, 173, 0.1);
+}
+
+.form-group input.ng-invalid.ng-touched,
+.form-group select.ng-invalid.ng-touched {
+  border-color: #D9534F;
+  background: #FFF9F9;
+}
+
+.form-group input:disabled,
+.form-group select:disabled {
+  background: #E8F4FD;
+  color: #5A6B85;
+  cursor: not-allowed;
+}
+
+.form-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230070AD' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 12px 8px;
+}
+
+.form-group select option {
+  background: #FFFFFF;
+}
+
+.form-group input[type="file"] {
+  padding: 0.5rem;
+  font-size: 0.82rem;
+  background: #FFFFFF;
+}
+
+.form-group small.error {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: #D9534F;
+  font-weight: 500;
+}
+
+
+/* ================================================
+   FORM MODE – Image Preview
+   ================================================ */
+
+.image-preview {
+  margin-top: 0.5rem;
+}
+
+.image-preview img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #D6EEFF;
+}
+
+
+/* ================================================
+   FORM MODE – Actions
+   ================================================ */
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid #E8F4FD;
+}
+
+
+/* ================================================
+   RESPONSIVE – Tablet (≤ 1024px)
+   ================================================ */
+
+@media (max-width: 1024px) {
 
   .form-grid {
     grid-template-columns: 1fr;
   }
 
-
-  .filters {
-    flex-direction: column;
-  }
-
-
   .page-header,
   .form-header {
     flex-direction: column;
-
     align-items: flex-start;
-
-    gap: 15px;
   }
 
+}
+
+
+/* ================================================
+   RESPONSIVE – Mobile (≤ 768px)
+   ================================================ */
+
+@media (max-width: 768px) {
+
+  .page-header h2,
+  .form-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .filters {
+    flex-direction: column;
+    padding: 0.8rem;
+  }
+
+  .search-box {
+    flex-direction: column;
+  }
+
+  .search-box input,
+  .search-box button,
+  .filters select,
+  .filters > button {
+    width: 100%;
+  }
+
+  .form-section {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+
+  /* Table: full bleed scroll */
+  .table-container {
+    margin: 0 -16px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  thead th {
+    padding: 0.6rem 0.7rem;
+    font-size: 0.7rem;
+  }
+
+  tbody td {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+}
+
+
+/* ================================================
+   RESPONSIVE – Small mobile (≤ 480px)
+   ================================================ */
+
+@media (max-width: 480px) {
+
+  .page-header h2,
+    .form-header h2 {
+      font-size: 1.1rem;
+    }
+
+  .image-preview img {
+    width: 64px;
+    height: 64px;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.72rem;
+  }
+
+}
+
+
+/* ================================================
+   TABLE SCROLLBAR
+   ================================================ */
+
+.table-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #F4FAFF;
+  border-radius: 6px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #4DA8DA;
+  border-radius: 6px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #0070AD;
 }

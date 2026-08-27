@@ -14,6 +14,7 @@ import {
   RouterOutlet
 } from '@angular/router';
 import { AuthService } from '../../Services/auth-service';
+import { NotificationService } from '../../Services/notification-service';
 
 @Component({
   selector: 'app-admin',
@@ -31,10 +32,20 @@ export class Admin implements OnInit {
   sidebarOpen = true;
 
   currentUser: any;
+  unreadNotifications = 0;
+  profileMenuOpen = false;
+
+  getProfileImageUrl(url: string | null | undefined): string | null {
+    if (!url || !url.trim()) return null;
+    return /^https?:\/\//i.test(url)
+      ? url
+      : `http://localhost:3000${url.startsWith('/') ? '' : '/'}${url}`;
+  }
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -44,6 +55,22 @@ export class Admin implements OnInit {
     }
 
     this.currentUser = this.authService.getCurrentUser();
+    this.loadUnreadNotifications();
+  }
+
+  loadUnreadNotifications(): void {
+    this.notificationService.getUnreadCount().subscribe({
+      next: count => this.unreadNotifications = count,
+      error: () => this.unreadNotifications = 0
+    });
+  }
+
+  toggleProfileMenu(): void {
+    this.profileMenuOpen = !this.profileMenuOpen;
+  }
+
+  closeProfileMenu(): void {
+    this.profileMenuOpen = false;
   }
 
   toggleSidebar(): void {
@@ -60,6 +87,7 @@ export class Admin implements OnInit {
   }
 
   logout(): void {
+    this.closeProfileMenu();
     this.authService.logout();
     this.router.navigate(['/login']);
   }

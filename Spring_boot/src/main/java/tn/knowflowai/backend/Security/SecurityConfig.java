@@ -31,45 +31,140 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    // =========================================================
+    // PASSWORD ENCODER
+    // =========================================================
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // =========================================================
+    // AUTHENTICATION PROVIDER
+    // =========================================================
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
+
+        DaoAuthenticationProvider provider =
+                new DaoAuthenticationProvider();
+
+        provider.setUserDetailsService(
+                userDetailsService
+        );
+
+        provider.setPasswordEncoder(
+                passwordEncoder()
+        );
+
         return provider;
     }
+
+    // =========================================================
+    // AUTHENTICATION MANAGER
+    // =========================================================
 
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
     ) throws Exception {
+
         return configuration.getAuthenticationManager();
     }
 
+    // =========================================================
+    // SECURITY FILTER CHAIN
+    // =========================================================
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http
+    ) throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> {})
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+            // -------------------------------------------------
+            // CSRF
+            // -------------------------------------------------
+
+            .csrf(csrf ->
+                csrf.disable()
             )
-            .authenticationProvider(authenticationProvider())
+
+            // -------------------------------------------------
+            // CORS
+            // -------------------------------------------------
+
+            .cors(cors -> {})
+
+            // -------------------------------------------------
+            // SESSION
+            // -------------------------------------------------
+
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
+            )
+
+            // -------------------------------------------------
+            // AUTHENTICATION PROVIDER
+            // -------------------------------------------------
+
+            .authenticationProvider(
+                authenticationProvider()
+            )
+
+            // -------------------------------------------------
+            // AUTHORIZATION
+            // -------------------------------------------------
+
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                // Allow access to the uploaded images
-                .requestMatchers("/images/**").permitAll()
-                // Everything else needs JWT
+
+                // =============================================
+                // PUBLIC AUTHENTICATION ENDPOINTS
+                // =============================================
+
+                .requestMatchers(
+                    "/api/auth/**"
+                ).permitAll()
+
+                // =============================================
+                // SPRING ERROR ENDPOINT
+                // =============================================
+
+                .requestMatchers(
+                    "/error"
+                ).permitAll()
+
+                // =============================================
+                // PUBLIC IMAGES
+                // =============================================
+
+                .requestMatchers(
+                    "/images/**"
+                ).permitAll()
+
+                // =============================================
+                // PUBLIC FILE ACCESS
+                // =============================================
+
+                .requestMatchers(
+                    "/files/**"
+                ).permitAll()
+
+                // =============================================
+                // EVERYTHING ELSE REQUIRES JWT
+                // =============================================
+
                 .anyRequest().authenticated()
             )
+
+            // -------------------------------------------------
+            // JWT FILTER
+            // -------------------------------------------------
+
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class

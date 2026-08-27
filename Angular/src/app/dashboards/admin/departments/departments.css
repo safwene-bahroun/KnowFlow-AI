@@ -1,0 +1,479 @@
+/* ================================================
+   DEPARTMENTS PAGE – Capgemini KnowFlow AI Theme
+   ================================================
+   Primary Blue  : #0070AD
+   Deep Navy     : #002E5A
+   Blue Ciel     : #4DA8DA
+   Light Ciel    : #E8F4FD
+   Pale Ciel     : #F4FAFF
+   White         : #FFFFFF
+   Dark Text     : #1B2A4A
+   Muted Text    : #5A6B85
+   Border        : #D6EEFF
+   Success Green : #1A8754
+   Error Red     : #D9534F
+   ================================================ */
+
+
+/* ================================================
+   CONTAINER + ANIMATION
+   ================================================ */
+
+.department-container {
+  max-width: 900px;
+  margin: 0 auto;
+  animation: page-enter 0.35s ease forwards;
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ================================================
+   HEADING
+   ================================================ */
+
+.department-container h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0070AD;
+  margin: 0 0 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.department-form h3,
+.department-list h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1B2A4A;
+  margin: 0 0 1rem;
+}
+
+
+/* ================================================
+   MESSAGES
+   ================================================ */
+
+.success-message {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #1A8754;
+  background: #EEFBF3;
+  border: 1px solid #B8E8CC;
+  border-radius: 10px;
+  line-height: 1.45;
+}
+
+.error-message {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #D9534F;
+  background: #FFF3F3;
+  border: 1px solid #FACBCB;
+  border-radius: 10px;
+  line-height: 1.45;
+}
+
+
+/* ================================================
+   SEARCH BAR
+   ================================================ */
+
+.search-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #D6EEFF;
+  border-radius: 12px;
+}
+
+.search-container input {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.88rem;
+  color: #1B2A4A;
+  background: #F4FAFF;
+  border: 1.5px solid #D6EEFF;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.search-container input:focus {
+  border-color: #0070AD;
+  box-shadow: 0 0 0 3px rgba(0, 112, 173, 0.1);
+  background: #FFFFFF;
+}
+
+.search-container input::placeholder {
+  color: #99B4CC;
+}
+
+.search-container button:first-of-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #0070AD 0%, #4DA8DA 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.search-container button:first-of-type:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 112, 173, 0.3);
+}
+
+.search-container button:last-of-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0070AD;
+  background: #E8F4FD;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.search-container button:last-of-type:hover {
+  background: #D6EEFF;
+}
+
+
+/* ================================================
+   FORM CARD
+   ================================================ */
+
+.department-form {
+  background: #FFFFFF;
+  border: 1px solid #D6EEFF;
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+
+/* ---- Form Groups ---- */
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1B2A4A;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.88rem;
+  color: #1B2A4A;
+  background: #F4FAFF;
+  border: 1.5px solid #D6EEFF;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-group input::placeholder {
+  color: #99B4CC;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #0070AD;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(0, 112, 173, 0.1);
+}
+
+.form-group input.ng-invalid.ng-touched {
+  border-color: #D9534F;
+  background: #FFF9F9;
+}
+
+.form-group input.ng-invalid.ng-touched:focus {
+  box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: #D9534F;
+  font-weight: 500;
+}
+
+
+/* ---- Form Buttons ---- */
+
+.department-form form button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.3rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+  margin-right: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.department-form form button[type="submit"] {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #0070AD 0%, #4DA8DA 100%);
+  box-shadow: 0 2px 8px rgba(0, 112, 173, 0.2);
+}
+
+.department-form form button[type="submit"]:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 112, 173, 0.3);
+}
+
+.department-form form button[type="submit"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.department-form form button[type="button"] {
+  color: #0070AD;
+  background: #E8F4FD;
+}
+
+.department-form form button[type="button"]:hover {
+  background: #D6EEFF;
+}
+
+
+/* ================================================
+   DEPARTMENT LIST
+   ================================================ */
+
+.department-list {
+  background: #FFFFFF;
+  border: 1px solid #D6EEFF;
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.department-list > p {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #5A6B85;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+
+/* ================================================
+   TABLE
+   ================================================ */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+thead {
+  background: #0070AD;
+}
+
+thead th {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+tbody tr {
+  border-bottom: 1px solid #E8F4FD;
+  transition: background 0.15s ease;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #F4FAFF;
+}
+
+tbody td {
+  padding: 0.75rem 1rem;
+  color: #1B2A4A;
+  vertical-align: middle;
+}
+
+/* Description column */
+tbody td:nth-child(3) {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Actions */
+tbody td:last-child {
+  white-space: nowrap;
+}
+
+tbody td button {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  margin-right: 0.4rem;
+}
+
+tbody td button:first-of-type {
+  color: #0070AD;
+  background: #E8F4FD;
+}
+
+tbody td button:first-of-type:hover {
+  background: #D6EEFF;
+}
+
+tbody td button:last-of-type {
+  color: #D9534F;
+  background: #FFF3F3;
+}
+
+tbody td button:last-of-type:hover {
+  background: #FACBCB;
+}
+
+
+/* ================================================
+   RESPONSIVE – Mobile (≤ 768px)
+   ================================================ */
+
+@media (max-width: 768px) {
+
+  .department-container h2 {
+    font-size: 1.25rem;
+  }
+
+  .search-container {
+    flex-direction: column;
+    padding: 0.8rem;
+  }
+
+  .search-container input,
+  .search-container button {
+    width: 100%;
+  }
+
+  .department-form,
+  .department-list {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  /* Form buttons stack */
+  .department-form form button {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  /* Table horizontal scroll */
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  thead th,
+  tbody td {
+    padding: 0.6rem 0.7rem;
+    font-size: 0.82rem;
+  }
+
+  tbody td:nth-child(3) {
+    max-width: 180px;
+  }
+
+  /* Action buttons stack */
+  tbody td:last-child {
+    white-space: normal;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  tbody td button {
+    margin-right: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+}
+
+
+/* ================================================
+   RESPONSIVE – Small mobile (≤ 480px)
+   ================================================ */
+
+@media (max-width: 480px) {
+
+  .department-container h2 {
+    font-size: 1.1rem;
+  }
+
+  .department-form h3,
+  .department-list h3 {
+    font-size: 1rem;
+  }
+}

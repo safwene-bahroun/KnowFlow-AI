@@ -5,6 +5,7 @@ import {
 } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
+import { UserResponse } from './auth-service';
 
 // =========================================================
 // ROLE
@@ -74,6 +75,15 @@ export interface User {
   department?: Department;
 }
 
+export interface ProfileRequest {
+  name: string;
+  familyName: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  urlImage?: string;
+}
+
 // =========================================================
 // USER SERVICE
 // =========================================================
@@ -91,6 +101,16 @@ export class UserService {
 
   private apiUrl =
     'http://localhost:3000/api/admin/users';
+
+  private profileUrl = 'http://localhost:3000/api/profile';
+
+  getProfile(): Observable<UserResponse> {
+    return this.http.get<UserResponse>(this.profileUrl);
+  }
+
+  updateProfile(profile: ProfileRequest): Observable<UserResponse> {
+    return this.http.put<UserResponse>(this.profileUrl, profile);
+  }
 
   // =======================================================
   // CREATE USER

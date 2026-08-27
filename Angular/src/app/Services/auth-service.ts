@@ -67,9 +67,8 @@ export interface ForgotPasswordRequest {
 
 export interface ResetPasswordRequest {
   token: string;
-  password: string;
+  newPassword: string;  // ✅ correspond au backend
 }
-
 
 // ============================
 // AUTH RESPONSE
@@ -347,6 +346,12 @@ export class AuthService {
       return null;
     }
 
+  }
+
+  updateStoredUser(user: UserResponse): void {
+    if (this.isBrowser()) {
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    }
   }
 
 

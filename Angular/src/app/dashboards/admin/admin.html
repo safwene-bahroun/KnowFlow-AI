@@ -3,20 +3,41 @@
   [class.sidebar-closed]="!sidebarOpen"
 >
 
+  <!-- ==========================================
+       SIDEBAR
+       ========================================== -->
+
   <aside class="sidebar">
 
+    <!-- Header / Logo -->
     <div class="sidebar-header">
       <div class="logo">
-        KnowFlow AI
+        <a
+          routerLink="/admin/dashboard"
+          class="navbar-brand"
+          aria-label="KnowFlow home page"
+        >
+          <img
+            class="navbar-brand-logo"
+            src="https://z-cdn-media.chatglm.cn/files/28663ada-6b10-4a18-8a36-cf96c41375ca.png?auth_key=1886212810-1b90f386a5d04a58874108728446b2cb-0-2b990b41148f9ce1c6ca56e45dcb5172"
+            alt="KnowFlow AI"
+          >
+          <div class="navbar-brand-text">
+            <span class="navbar-brand-name">KnowFlow AI</span>
+            <span class="navbar-brand-sub">Enterprise Knowledge Platform</span>
+          </div>
+        </a>
       </div>
     </div>
 
 
+    <!-- Navigation -->
     <nav class="sidebar-nav">
+
       <a
         routerLink="/admin/dashboard"
         routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: false }"
+        [routerLinkActiveOptions]="{ exact: true }"
       >
         <span class="icon">⌂</span>
         <span class="label">Dashboard</span>
@@ -49,10 +70,42 @@
         <span class="label">Documents</span>
       </a>
 
+      <a
+        routerLink="/admin/notifications"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span class="icon">🔔</span>
+        <span class="label">Notifications</span>
+      </a>
+
     </nav>
 
 
+    <!-- Footer -->
     <div class="sidebar-footer">
+
+      <a
+        routerLink="/admin/settings/profile"
+        class="profile-summary"
+      >
+        <img
+          *ngIf="getProfileImageUrl(currentUser?.urlImage) as imageUrl"
+          [src]="imageUrl"
+          alt="Profile"
+        >
+        <span
+          *ngIf="!getProfileImageUrl(currentUser?.urlImage)"
+          class="profile-initials"
+        >
+          {{ currentUser?.name?.charAt(0) || 'U' }}{{ currentUser?.familyName?.charAt(0) || '' }}
+        </span>
+        <span class="profile-name">
+          {{ currentUser?.name }} {{ currentUser?.familyName }}
+          <small>Profile settings</small>
+        </span>
+      </a>
+
       <button
         type="button"
         (click)="logout()"
@@ -66,22 +119,40 @@
         type="button"
         (click)="toggleSidebar()"
       >
-        ◀
+        <span class="icon">◀</span>
         <span class="label">Collapse</span>
       </button>
+
     </div>
 
   </aside>
 
 
+  <!-- ==========================================
+       MOBILE BACKDROP
+       ========================================== -->
+
+  <div
+    class="sidebar-backdrop"
+    [class.visible]="sidebarOpen"
+    (click)="toggleSidebar()"
+  ></div>
+
+
+  <!-- ==========================================
+       MAIN CONTENT
+       ========================================== -->
+
   <main class="main-content">
 
+    <!-- Topbar -->
     <header class="topbar">
 
       <button
         type="button"
         class="menu-button"
         (click)="toggleSidebar()"
+        aria-label="Toggle menu"
       >
         ☰
       </button>
@@ -90,14 +161,74 @@
         Admin Panel
       </div>
 
-      <div class="topbar-user">
-        {{ currentUser?.name }}
-        {{ currentUser?.familyName }}
+      <div
+        class="topbar-profile"
+        [class.menu-open]="profileMenuOpen"
+      >
+
+        <!-- Notification Bell -->
+        <a
+          routerLink="/admin/notifications"
+          class="notification-link"
+          aria-label="Notifications"
+          (click)="closeProfileMenu()"
+        >
+          <span class="notification-bell" aria-hidden="true">🔔</span>
+          <span
+            *ngIf="unreadNotifications > 0"
+            class="notification-badge"
+          >
+            {{ unreadNotifications > 99 ? '99+' : unreadNotifications }}
+          </span>
+        </a>
+
+        <!-- Profile Menu Trigger -->
+        <button
+          type="button"
+          class="profile-menu-button"
+          aria-label="Open profile menu"
+          (click)="toggleProfileMenu()"
+          [attr.aria-expanded]="profileMenuOpen"
+        >
+          <span class="topbar-user">
+            {{ currentUser?.name }} {{ currentUser?.familyName }}
+          </span>
+          <span class="menu-chevron">▾</span>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div
+          class="profile-menu"
+          *ngIf="profileMenuOpen"
+        >
+          <a
+            routerLink="/admin/notifications"
+            (click)="closeProfileMenu()"
+          >
+            🔔 Notifications
+            <strong *ngIf="unreadNotifications">{{ unreadNotifications }}</strong>
+          </a>
+          <a
+            routerLink="/admin/settings/profile"
+            (click)="closeProfileMenu()"
+          >
+            ⚙️ Profile settings
+          </a>
+          <button
+            type="button"
+            (click)="logout()"
+          >
+            <span>⎋</span>
+            <span>Logout</span>
+          </button>
+        </div>
+
       </div>
 
     </header>
 
 
+    <!-- Page Content (Router Outlet) -->
     <section class="page-content">
       <router-outlet></router-outlet>
     </section>

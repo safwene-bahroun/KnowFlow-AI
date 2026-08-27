@@ -13,6 +13,19 @@ import {
   DocumentVisibility
 } from '../dashboards/admin/Models/Document';
 
+export interface DocumentRequest {
+  name: string;
+  description: string;
+  author: string;
+  status: DocumentStatus;
+  visibility: DocumentVisibility;
+  departmentId: number | null;
+  fileName?: string;
+  mimeType?: string;
+  fileSize?: number;
+  fileData?: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +43,7 @@ export class DocumentService {
   // ==========================================
 
   create(
-    document: Document
+    document: DocumentRequest
   ): Observable<Document> {
 
     return this.http.post<Document>(
@@ -146,7 +159,7 @@ export class DocumentService {
 
   update(
     id: number,
-    document: Document
+    document: DocumentRequest
   ): Observable<Document> {
 
     return this.http.put<Document>(

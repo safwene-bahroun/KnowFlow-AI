@@ -1,0 +1,481 @@
+<div class="chat-layout">
+
+
+  <!-- ====================================== -->
+  <!-- SIDEBAR -->
+  <!-- ====================================== -->
+
+  <aside class="conversation-sidebar">
+
+
+    <div class="sidebar-header">
+
+      <h3>
+        Conversations
+      </h3>
+
+
+      <button
+
+        type="button"
+
+        class="new-chat-button"
+
+        (click)="newConversation()"
+
+      >
+
+        + New Chat
+
+      </button>
+
+    </div>
+
+
+    <div class="conversation-list">
+
+
+      <div
+
+        class="conversation-item"
+
+        *ngFor="
+          let conversation
+          of conversations
+        "
+
+        [class.active]="
+          conversation.id ===
+          conversationId
+        "
+
+        (click)="
+          selectConversation(
+            conversation
+          )
+        "
+
+      >
+
+
+        <span
+          class="conversation-title"
+        >
+
+          {{ conversation.title }}
+
+        </span>
+
+
+        <button
+
+          type="button"
+
+          class="delete-button"
+
+          (click)="
+            deleteConversation(
+              conversation,
+              $event
+            )
+          "
+
+        >
+
+          🗑
+
+        </button>
+
+
+      </div>
+
+
+      <div
+
+        class="empty-conversations"
+
+        *ngIf="
+          conversations.length === 0
+        "
+
+      >
+
+        No conversations yet.
+
+      </div>
+
+
+    </div>
+
+
+  </aside>
+
+
+
+  <!-- ====================================== -->
+  <!-- CHAT -->
+  <!-- ====================================== -->
+
+  <div class="chat-container">
+
+
+    <!-- HEADER -->
+
+    <div class="chat-header">
+
+
+      <div class="chat-title">
+
+
+        <div class="bot-icon">
+
+          🤖
+
+        </div>
+
+
+        <div>
+
+          <h2>
+
+            KnowFlow AI
+
+          </h2>
+
+
+          <span>
+
+            AI Document Assistant
+
+          </span>
+
+        </div>
+
+
+      </div>
+
+
+      <button
+
+        class="new-chat-button"
+
+        type="button"
+
+        (click)="newConversation()"
+
+      >
+
+        + New Chat
+
+      </button>
+
+
+    </div>
+
+
+
+    <!-- MESSAGES -->
+
+    <div class="messages-container">
+
+
+      <!-- EMPTY CHAT -->
+
+      <div
+
+        class="welcome"
+
+        *ngIf="messages.length === 0"
+
+      >
+
+
+        <div class="welcome-icon">
+
+          🤖
+
+        </div>
+
+
+        <h2>
+
+          How can I help you?
+
+        </h2>
+
+
+        <p>
+
+          Ask questions about documents
+          you are authorized to access.
+
+        </p>
+
+
+        <div class="suggestions">
+
+
+          <button
+
+            type="button"
+
+            (click)="
+              question =
+              'What documents can I access?'
+            "
+
+          >
+
+            What documents can I access?
+
+          </button>
+
+
+          <button
+
+            type="button"
+
+            (click)="
+              question =
+              'Summarize my available documents'
+            "
+
+          >
+
+            Summarize my documents
+
+          </button>
+
+
+          <button
+
+            type="button"
+
+            (click)="
+              question =
+              'What is the company policy?'
+            "
+
+          >
+
+            What is the company policy?
+
+          </button>
+
+
+        </div>
+
+
+      </div>
+
+
+
+      <!-- CHAT MESSAGES -->
+
+      <div
+
+        class="message-row"
+
+        *ngFor="
+          let message
+          of messages
+        "
+
+        [class.user-message]="
+          message.role === 'USER'
+        "
+
+        [class.assistant-message]="
+          message.role === 'AI'
+        "
+
+      >
+
+
+        <!-- AI AVATAR -->
+
+        <div
+
+          class="message-avatar"
+
+          *ngIf="
+            message.role === 'AI'
+          "
+
+        >
+
+          🤖
+
+        </div>
+
+
+
+        <!-- MESSAGE -->
+
+        <div class="message-bubble">
+
+          <div class="message-content">
+
+            {{ message.content }}
+
+          </div>
+
+        </div>
+
+
+
+        <!-- USER AVATAR -->
+
+        <div
+
+          class="
+            message-avatar
+            user-avatar
+          "
+
+          *ngIf="
+            message.role === 'USER'
+          "
+
+        >
+
+          👤
+
+        </div>
+
+
+      </div>
+
+
+
+      <!-- LOADING -->
+
+      <div
+
+        class="
+          message-row
+          assistant-message
+        "
+
+        *ngIf="loading"
+
+      >
+
+
+        <div class="message-avatar">
+
+          🤖
+
+        </div>
+
+
+        <div
+          class="
+            message-bubble
+            loading-bubble
+          "
+        >
+
+          Thinking...
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+
+    <!-- ERROR -->
+
+    <div
+
+      class="error-message"
+
+      *ngIf="errorMessage"
+
+    >
+
+      {{ errorMessage }}
+
+    </div>
+
+
+
+    <!-- INPUT -->
+
+    <div
+      class="
+        chat-input-container
+      "
+    >
+
+
+      <textarea
+
+        [(ngModel)]="question"
+
+        (keydown)="onEnter($event)"
+
+        placeholder="
+          Ask something about your documents...
+        "
+
+        rows="1"
+
+        [disabled]="loading"
+
+      ></textarea>
+
+
+      <button
+
+        type="button"
+
+        class="send-button"
+
+        (click)="sendMessage()"
+
+        [disabled]="
+          loading ||
+          !question.trim()
+        "
+
+      >
+
+        <span *ngIf="!loading">
+
+          Send
+
+        </span>
+
+
+        <span *ngIf="loading">
+
+          ...
+
+        </span>
+
+
+      </button>
+
+
+    </div>
+
+
+
+    <div class="chat-footer">
+
+      AI answers are generated only
+      from documents you are authorized
+      to access.
+
+    </div>
+
+
+  </div>
+
+
+</div>
