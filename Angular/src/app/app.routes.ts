@@ -11,7 +11,7 @@ import { Users } from './dashboards/admin/users/users';
 import { Departments } from './dashboards/admin/departments/departments';
 import { SetingProfile } from './dashboards/admin/seting-profile/seting-profile';
 import { Notifications } from './dashboards/admin/notifications/notifications';
-import { Authentication } from './authentication/authentication';
+
 import { authGuard } from './guards/auth-guard';
 
 
@@ -57,10 +57,7 @@ export const routes: Routes = [
     component: ResetPassword
   },
 
-  {
-    path: 'auth',
-    component: Authentication
-  },
+
 
 
   // ==========================================
@@ -174,6 +171,13 @@ export const routes: Routes = [
         path: 'settings/profile',
         component: SetingProfile
       },
+    {
+      path: 'log',
+
+      loadComponent: () =>
+        import('./dashboards/admin/log/log')
+          .then(m => m.Log)
+    },
 
 
       // NOTIFICATIONS

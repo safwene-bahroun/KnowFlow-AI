@@ -532,20 +532,198 @@ td:last-child {
 
 
 /* ================================================
-   FORM MODE – Image Preview
+   FORM MODE – Modern Drag & Drop Photo Upload
    ================================================ */
 
-.image-preview {
-  margin-top: 0.5rem;
+.photo-upload-section {
+  margin-top: 1.2rem;
 }
 
-.image-preview img {
-  width: 80px;
-  height: 80px;
+.photo-upload-section .section-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1B2A4A;
+  margin-bottom: 0.6rem;
+}
+
+.photo-drop-zone {
+  position: relative;
+  background: #F4FAFF;
+  border: 2px dashed #B8DCF5;
+  border-radius: 16px;
+  padding: 1.8rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.photo-drop-zone:hover {
+  background: #EBF5FC;
+  border-color: #0070AD;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 112, 173, 0.08);
+}
+
+.photo-drop-zone.dragging {
+  background: #E1F0FA;
+  border-color: #0070AD;
+  border-style: solid;
+  transform: scale(1.01);
+  box-shadow: 0 0 0 4px rgba(0, 112, 173, 0.15), 0 8px 24px rgba(0, 112, 173, 0.12);
+}
+
+.photo-drop-zone.has-preview {
+  background: #FFFFFF;
+  border: 1.5px solid #D6EEFF;
+  cursor: default;
+  padding: 1.4rem;
+}
+
+/* Empty Drop State */
+.empty-drop-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.upload-icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #E8F4FD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.photo-drop-zone:hover .upload-icon-circle {
+  transform: scale(1.08);
+  background: #D6EEFF;
+}
+
+.upload-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.upload-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1B2A4A;
+}
+
+.browse-link {
+  color: #0070AD;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.upload-formats {
+  font-size: 0.78rem;
+  color: #5A6B85;
+}
+
+/* Preview State */
+.preview-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.avatar-frame {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, #0070AD, #4DA8DA);
+  box-shadow: 0 4px 16px rgba(0, 112, 173, 0.2);
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #D6EEFF;
+  background: #FFFFFF;
 }
+
+.preview-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.preview-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #1A8754;
+  background: #EEFBF3;
+  border: 1px solid #C3EED2;
+  border-radius: 20px;
+}
+
+.preview-hint {
+  font-size: 0.8rem;
+  color: #5A6B85;
+  margin: 0;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.btn-change-photo,
+.btn-remove-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-change-photo {
+  color: #0070AD;
+  background: #E8F4FD;
+  border: 1px solid #D6EEFF;
+}
+
+.btn-change-photo:hover {
+  background: #D6EEFF;
+  transform: translateY(-1px);
+}
+
+.btn-remove-photo {
+  color: #D9534F;
+  background: #FFF3F3;
+  border: 1px solid #FACBCB;
+}
+
+.btn-remove-photo:hover {
+  background: #FACBCB;
+  transform: translateY(-1px);
+}
+
 
 
 /* ================================================

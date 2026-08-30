@@ -1,7 +1,9 @@
 import {
+  ChangeDetectorRef,
   Component,
   OnInit,
-  OnDestroy
+  OnDestroy,
+  inject
 } from '@angular/core';
 
 import {
@@ -77,10 +79,9 @@ export class ChatBot implements OnInit, OnDestroy {
   currentUser: UserResponse | null = null;
 
 
-  constructor(
-    private chatBotService: ChatBotService,
-    private authService: AuthService
-  ) {}
+  private readonly chatBotService = inject(ChatBotService);
+  private readonly authService    = inject(AuthService);
+  private readonly cdr             = inject(ChangeDetectorRef);
 
 
   // ==========================================
@@ -127,9 +128,11 @@ export class ChatBot implements OnInit, OnDestroy {
       .subscribe({
         next: (conversations) => {
           this.conversations = conversations;
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error loading conversations', error);
+          this.cdr.markForCheck();
         }
       });
   }
@@ -162,12 +165,14 @@ export class ChatBot implements OnInit, OnDestroy {
         next: (messages) => {
           this.messages = messages;
           this.loading = false;
+          this.cdr.markForCheck();
           this.scrollToBottom();
         },
         error: (error) => {
           console.error(error);
           this.errorMessage = 'Unable to load conversation.';
           this.loading = false;
+          this.cdr.markForCheck();
         }
       });
   }
@@ -218,6 +223,7 @@ export class ChatBot implements OnInit, OnDestroy {
           });
 
           this.loading = false;
+          this.cdr.markForCheck();
 
           // Reload sidebar
           this.loadConversations();
@@ -242,6 +248,7 @@ export class ChatBot implements OnInit, OnDestroy {
             'Unknown error'
           }`;
           this.loading = false;
+          this.cdr.markForCheck();
         }
       });
   }

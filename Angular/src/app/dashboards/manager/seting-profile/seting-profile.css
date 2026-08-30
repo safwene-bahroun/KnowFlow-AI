@@ -35,7 +35,16 @@
    PAGE HEADER
    ================================================ */
 
+/* ================================================
+   PAGE HEADER & META BADGES
+   ================================================ */
+
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
@@ -60,6 +69,36 @@
   margin: 0;
   font-size: 0.88rem;
   color: #5A6B85;
+}
+
+.user-meta-badges {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+.department-badge {
+  background: #E8F4FD;
+  color: #0070AD;
+  border: 1px solid #D6EEFF;
+}
+
+.role-badge {
+  background: #EEFBF3;
+  color: #1A8754;
+  border: 1px solid #C3EED2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 
@@ -109,41 +148,51 @@
   align-items: flex-start;
 }
 
-/* ---- Avatar Panel (left) ---- */
+/* ---- Avatar Panel (Drag & Drop) ---- */
 
 .avatar-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
+  gap: 0.8rem;
+  padding: 1.8rem 1.4rem;
   background: #FFFFFF;
-  border: 1px solid #D6EEFF;
-  border-radius: 14px;
+  border: 2px dashed #B8DCF5;
+  border-radius: 16px;
   flex-shrink: 0;
-  width: 200px;
+  width: 220px;
   text-align: center;
+  transition: all 0.25s ease;
 }
 
+.avatar-panel:hover {
+  border-color: #0070AD;
+  background: #F4FAFF;
+}
 
-/* ---- Avatar Circle ---- */
+.avatar-panel.dragging {
+  border-color: #0070AD;
+  border-style: solid;
+  background: #E1F0FA;
+  box-shadow: 0 0 0 4px rgba(0, 112, 173, 0.15);
+  transform: scale(1.02);
+}
+
+.avatar-ring-frame {
+  padding: 3px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0070AD, #4DA8DA);
+  box-shadow: 0 4px 16px rgba(0, 112, 173, 0.15);
+}
 
 .avatar {
-  width: 130px;
-  height: 130px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: #E8F4FD;
-  border: 3px solid #D6EEFF;
-  position: relative;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.avatar.has-image {
-  border-color: #4DA8DA;
-  box-shadow: 0 0 0 4px rgba(77, 168, 218, 0.15);
+  background: #FFFFFF;
 }
 
 .avatar img {
@@ -152,43 +201,33 @@
   object-fit: cover;
 }
 
-/* Placeholder text when no image */
-.avatar span {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #99B4CC;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+.avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #E8F4FD;
 }
 
-/* Hover camera hint */
-.avatar::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0);
-  transition: background 0.25s ease;
-  pointer-events: none;
+.avatar-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.2rem;
 }
-
-.avatar:hover::after {
-  background: rgba(0, 46, 90, 0.35);
-}
-
-
-/* ---- Upload Button ---- */
 
 .upload-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  font-size: 0.82rem;
+  gap: 0.35rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #0070AD;
   background: #E8F4FD;
-  border: 1.5px dashed #4DA8DA;
+  border: 1px solid #D6EEFF;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -196,7 +235,6 @@
 
 .upload-button:hover {
   background: #D6EEFF;
-  border-color: #0070AD;
   transform: translateY(-1px);
 }
 
@@ -204,11 +242,30 @@
   display: none;
 }
 
-.avatar-panel small {
-  font-size: 0.7rem;
-  color: #99B4CC;
-  line-height: 1.4;
+.remove-button {
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #D9534F;
+  background: #FFF3F3;
+  border: 1px solid #FACBCB;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
+
+.remove-button:hover {
+  background: #FACBCB;
+  transform: translateY(-1px);
+}
+
+.upload-hint {
+  font-size: 0.72rem;
+  color: #5A6B85;
+  line-height: 1.4;
+  margin: 0;
+}
+
 
 
 /* ---- Form Panel (right) ---- */

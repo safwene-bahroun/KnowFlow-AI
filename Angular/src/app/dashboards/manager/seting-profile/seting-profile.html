@@ -2,41 +2,71 @@
 	<header class="page-header">
 		<div>
 			<p class="eyebrow">Account</p>
-			<h2>Profile settings</h2>
-			<p>Update the information used across your KnowFlow account.</p>
+			<h2>Profile Settings</h2>
+			<p>Update your personal information and profile picture.</p>
+		</div>
+		<div class="user-meta-badges" *ngIf="!loading">
+			<span class="meta-badge department-badge" *ngIf="userDepartment">
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+				Department: {{ userDepartment }}
+			</span>
+			<span class="meta-badge role-badge" *ngIf="userRole">
+				{{ userRole }}
+			</span>
 		</div>
 	</header>
 
-	<p *ngIf="loading">Loading profile...</p>
+	<p *ngIf="loading" class="loading-state">Loading profile...</p>
 	<p *ngIf="errorMessage" class="message error">{{ errorMessage }}</p>
 	<p *ngIf="successMessage" class="message success">{{ successMessage }}</p>
 
 	<form *ngIf="!loading" [formGroup]="profileForm" (ngSubmit)="save()">
 		<div class="profile-layout">
-			<div class="avatar-panel">
-				<div class="avatar" [class.has-image]="imagePreview">
-					  <img *ngIf="imagePreview" [src]="imagePreview" alt="Profile" />
-					<span *ngIf="!imagePreview">Photo</span>
+			<!-- AVATAR DROP ZONE -->
+			<div 
+				class="avatar-panel"
+				[class.dragging]="isDragging"
+				(dragover)="onDragOver($event)"
+				(dragleave)="onDragLeave($event)"
+				(drop)="onDrop($event)"
+			>
+				<div class="avatar-ring-frame">
+					<div class="avatar" [class.has-image]="imagePreview">
+						<img *ngIf="imagePreview" [src]="imagePreview" alt="Profile" />
+						<div *ngIf="!imagePreview" class="avatar-placeholder">
+							<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0070AD" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+						</div>
+					</div>
 				</div>
-				<label class="upload-button">
-					Change photo
-					<input type="file" accept="image/*" (change)="onImageSelected($event)" />
-				</label>
-				<small>PNG, JPG or WEBP. Maximum 5 MB.</small>
+
+				<div class="avatar-actions">
+					<label class="upload-button">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+						{{ imagePreview ? 'Change photo' : 'Upload photo' }}
+						<input type="file" accept="image/png,image/jpeg,image/webp,image/jpg" (change)="onImageSelected($event)" />
+					</label>
+					<button *ngIf="imagePreview" type="button" class="remove-button" (click)="removeImage()">
+						Remove
+					</button>
+				</div>
+				<small class="upload-hint">Drag & drop photo here or browse (Max 5 MB)</small>
 			</div>
 
 			<div class="form-panel">
 				<div class="field-row">
-					<label>First name<input formControlName="name" /></label>
-					<label>Family name<input formControlName="familyName" /></label>
+					<label>First name *<input formControlName="name" /></label>
+					<label>Family name *<input formControlName="familyName" /></label>
 				</div>
-				<label>Email<input type="email" formControlName="email" /></label>
-				<label>Phone number<input formControlName="phoneNumber" /></label>
+				<div class="field-row">
+					<label>Email *<input type="email" formControlName="email" /></label>
+					<label>Phone number<input formControlName="phoneNumber" /></label>
+				</div>
 				<label>Address<textarea formControlName="address" rows="3"></textarea></label>
-				<button type="submit" [disabled]="saving">
+				<button type="submit" class="save-button" [disabled]="saving">
 					{{ saving ? 'Saving...' : 'Save changes' }}
 				</button>
 			</div>
 		</div>
 	</form>
 </section>
+

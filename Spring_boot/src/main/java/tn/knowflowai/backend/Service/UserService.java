@@ -6,8 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tn.knowflowai.backend.DTO.ProfileRequest;
-import tn.knowflowai.backend.Service.ImageStorageService;
+import tn.knowflowai.backend.Entity.Department;
 import tn.knowflowai.backend.Entity.User;
+import tn.knowflowai.backend.Repository.DepartmentRepository;
 import tn.knowflowai.backend.Repository.UserRepository;
 
 @Service
@@ -15,15 +16,18 @@ import tn.knowflowai.backend.Repository.UserRepository;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final DepartmentRepository departmentRepository;
     private final PasswordEncoder passwordEncoder;
     private final ImageStorageService imageStorageService;
 
     public UserService(
             UserRepository userRepository,
+            DepartmentRepository departmentRepository,
             PasswordEncoder passwordEncoder,
             ImageStorageService imageStorageService
     ) {
         this.userRepository = userRepository;
+        this.departmentRepository = departmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.imageStorageService = imageStorageService;
     }
@@ -35,13 +39,32 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
 
-        if (userRepository.existsByCin(user.getCin())) {
+        if (user.getCin() != null && !user.getCin().isBlank() && userRepository.existsByCin(user.getCin())) {
             throw new RuntimeException("CIN already exists");
         }
 
-        user.setPassword(
-                passwordEncoder.encode(user.getPassword())
-        );
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            user.setPassword(
+                    passwordEncoder.encode(user.getPassword())
+            );
+        }
+
+        // Handle profile image
+        if (user.getUrlImage() != null && user.getUrlImage().startsWith("data:image")) {
+            try {
+                user.setUrlImage(imageStorageService.saveBase64Image(user.getUrlImage()));
+            } catch (IOException e) {
+                System.err.println("Failed to save profile image: " + e.getMessage());
+            }
+        }
+
+        // Handle department
+        if (user.getDepartment() != null && user.getDepartment().getId() != null) {
+            Department dept = departmentRepository.findById(user.getDepartment().getId()).orElse(null);
+            user.setDepartment(dept);
+        } else {
+            user.setDepartment(null);
+        }
 
         return userRepository.save(user);
     }
@@ -118,6 +141,16 @@ public class UserService {
 
         User user = getById(id);
 
+        if (!user.getEmail().equalsIgnoreCase(updatedUser.getEmail()) && userRepository.existsByEmail(updatedUser.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        if (updatedUser.getCin() != null && !updatedUser.getCin().isBlank() &&
+                (user.getCin() == null || !user.getCin().equalsIgnoreCase(updatedUser.getCin())) &&
+                userRepository.existsByCin(updatedUser.getCin())) {
+            throw new RuntimeException("CIN already exists");
+        }
+
         user.setName(updatedUser.getName());
         user.setFamilyName(updatedUser.getFamilyName());
         user.setEmail(updatedUser.getEmail());
@@ -126,10 +159,33 @@ public class UserService {
         user.setGender(updatedUser.getGender());
         user.setPhoneNumber(updatedUser.getPhoneNumber());
         user.setAddress(updatedUser.getAddress());
-        user.setUrlImage(updatedUser.getUrlImage());
         user.setRole(updatedUser.getRole());
         user.setEmployeeProfile(updatedUser.getEmployeeProfile());
-        user.setDepartment(updatedUser.getDepartment());
+        user.setEnabled(updatedUser.isEnabled());
+
+        // Update password if provided
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        // Handle profile image update
+        if (updatedUser.getUrlImage() != null && updatedUser.getUrlImage().startsWith("data:image")) {
+            try {
+                user.setUrlImage(imageStorageService.saveBase64Image(updatedUser.getUrlImage()));
+            } catch (IOException e) {
+                System.err.println("Failed to save profile image on update: " + e.getMessage());
+            }
+        } else if (updatedUser.getUrlImage() != null) {
+            user.setUrlImage(updatedUser.getUrlImage());
+        }
+
+        // Handle department update
+        if (updatedUser.getDepartment() != null && updatedUser.getDepartment().getId() != null) {
+            Department dept = departmentRepository.findById(updatedUser.getDepartment().getId()).orElse(null);
+            user.setDepartment(dept);
+        } else {
+            user.setDepartment(null);
+        }
 
         return userRepository.save(user);
     }

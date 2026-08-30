@@ -319,22 +319,23 @@
         </div>
 
 
-        <!-- PROFILE IMAGE (File Input) -->
-
+        <!-- PROFILE IMAGE (Drag & Drop) -->
         <div class="form-group">
-
-          <label>Profile image</label>
+          <label>Profile Image</label>
 
           <div
             class="file-dropzone"
             [class.has-file]="imagePreview"
+            [class.dragging]="isDragging"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
             (click)="fileInput.click()"
           >
-
             <input
               #fileInput
               type="file"
-              accept="image/*"
+              accept="image/png,image/jpeg,image/webp,image/jpg"
               class="file-input-hidden"
               (change)="onFileSelected($event)"
             >
@@ -365,8 +366,8 @@
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
-              <span>Click to upload an image</span>
-              <span class="dropzone-hint">JPG, PNG or GIF</span>
+              <span>Drag & drop photo or click to browse</span>
+              <span class="dropzone-hint">PNG, JPG or WEBP (Max 5MB)</span>
             </div>
 
             <!-- Remove button -->
@@ -378,10 +379,9 @@
             >
               &#10005;
             </button>
-
           </div>
-
         </div>
+
 
 
         <!-- PASSWORD -->

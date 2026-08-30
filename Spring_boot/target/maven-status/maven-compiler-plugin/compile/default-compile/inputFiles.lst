@@ -19,6 +19,7 @@ C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\ba
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\Auth\UserResponse.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\ChatQuestionRequest.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\ChunkRequest.java
+C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\DocumentIngestRequest.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\DocumentRequest.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\DocumentResponse.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\FlaskRagRequest.java

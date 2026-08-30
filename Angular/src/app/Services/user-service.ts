@@ -160,17 +160,10 @@ export class UserService {
       `${this.apiUrl}/email/${encodeURIComponent(email)}`
     );
   }
-getAllDepartments() {
-  return this.http.get<{ id: number; name: string }[]>('/api/departments');
-}
+  getAllDepartments(): Observable<{ id: number; name: string }[]> {
+    return this.http.get<{ id: number; name: string }[]>('http://localhost:3000/api/admin/departments');
+  }
 
-createWithImage(formData: FormData) {
-  return this.http.post<User>(`${this.apiUrl}`, formData);
-}
-
-updateWithImage(id: number, formData: FormData) {
-  return this.http.put<User>(`${this.apiUrl}/${id}`, formData);
-}
   // =======================================================
   // GET USER BY CIN
   // GET /api/admin/users/cin/{cin}

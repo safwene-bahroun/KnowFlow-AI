@@ -1,9 +1,11 @@
 import {
+  ChangeDetectorRef,
   Component,
   OnInit,
   OnDestroy,
   Output,
-  EventEmitter
+  EventEmitter,
+  inject
 } from '@angular/core';
 
 import {
@@ -60,9 +62,8 @@ export class History implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
 
 
-  constructor(
-    private chatBotService: ChatBotService
-  ) {}
+  private readonly chatBotService = inject(ChatBotService);
+  private readonly cdr             = inject(ChangeDetectorRef);
 
 
   // ==========================================
@@ -94,11 +95,13 @@ export class History implements OnInit, OnDestroy {
         next: (conversations) => {
           this.conversations = conversations;
           this.loading = false;
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error loading conversations', error);
           this.errorMessage = 'Failed to load conversations.';
           this.loading = false;
+          this.cdr.markForCheck();
         }
       });
 

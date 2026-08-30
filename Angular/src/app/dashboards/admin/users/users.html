@@ -203,20 +203,80 @@
       </div>
     </div>
 
-    <!-- ACCOUNT + IMAGE -->
+    <!-- ACCOUNT + PROFILE IMAGE -->
     <div class="form-section">
-      <h3>Account</h3>
-
-      <div class="form-group" *ngIf="mode === 'add'">
-        <label>Password *</label>
-        <input type="password" formControlName="password" />
+      <h3>Account & Security</h3>
+      <div class="form-grid">
+        <div class="form-group" *ngIf="mode === 'add'">
+          <label>Password *</label>
+          <input type="password" formControlName="password" placeholder="Min. 6 characters" />
+        </div>
+        <div class="form-group" *ngIf="mode === 'edit'">
+          <label>New Password (optional)</label>
+          <input type="password" formControlName="password" placeholder="Leave empty to keep current" />
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Profile Image</label>
-        <input type="file" accept="image/*" (change)="onImageSelected($event)" />
-        <div *ngIf="imagePreview" class="image-preview">
-          <img [src]="imagePreview" alt="Profile preview" />
+      <!-- MODERN DRAG & DROP PHOTO PROFILE -->
+      <div class="photo-upload-section">
+        <label class="section-label">Profile Photo</label>
+        
+        <div class="drop-zone-container">
+          <!-- DROP ZONE -->
+          <div 
+            class="photo-drop-zone"
+            [class.dragging]="isDragging"
+            [class.has-preview]="!!imagePreview"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+            (click)="fileInput.click()"
+          >
+            <input 
+              #fileInput 
+              type="file" 
+              accept="image/png,image/jpeg,image/webp,image/jpg" 
+              (change)="onImageSelected($event)" 
+              style="display: none;" 
+            />
+
+            <!-- PREVIEW STATE -->
+            <div *ngIf="imagePreview" class="preview-wrapper" (click)="$event.stopPropagation()">
+              <div class="avatar-frame">
+                <img [src]="imagePreview" alt="Profile preview" class="preview-img" />
+                <div class="avatar-ring"></div>
+              </div>
+              <div class="preview-details">
+                <span class="preview-badge">Avatar Ready</span>
+                <p class="preview-hint">Drop a new image to replace</p>
+                <div class="preview-actions">
+                  <button type="button" class="btn-change-photo" (click)="fileInput.click()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Change Photo
+                  </button>
+                  <button type="button" class="btn-remove-photo" (click)="removeImage()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- EMPTY UPLOAD STATE -->
+            <div *ngIf="!imagePreview" class="empty-drop-content">
+              <div class="upload-icon-circle">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0070AD" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <div class="upload-text">
+                <span class="upload-title">Drag & Drop photo here, or <span class="browse-link">Browse</span></span>
+                <span class="upload-formats">Supports PNG, JPG or WEBP (Max. 5MB)</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -244,4 +304,4 @@
       </button>
     </div>
   </form>
-</div>
+</div>

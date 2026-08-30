@@ -87,29 +87,19 @@ export interface AuthResponse {
 
 export interface UserResponse {
   id: number;
-
   name: string;
   familyName: string;
-
   email: string;
-
   cin?: string;
-
   phoneNumber?: string;
-
   urlImage?: string;
-
   address?: string;
-
   age?: number;
-
   role: string;
-
   employeeProfile: string;
-
   gender: string;
-
   departmentId?: number;
+  departmentName?: string;
 }
 
 

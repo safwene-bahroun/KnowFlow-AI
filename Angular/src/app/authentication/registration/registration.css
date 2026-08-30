@@ -826,29 +826,111 @@
 
 
 /* -----------------------------------------------
-   BOTTOM LINK
+   FILE DROPZONE (Profile Photo)
    ----------------------------------------------- */
 
-.bottom-link {
-  text-align: center;
-  margin: 1.2rem 0 0;
-  font-size: 0.85rem;
-  color: #5A6B85;
+.file-dropzone {
   position: relative;
+  border: 2px dashed #B8DCF5;
+  border-radius: 14px;
+  background: #F4FAFF;
+  padding: 1.2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
 }
 
-.bottom-link a {
-  color: #0070AD;
-  text-decoration: none;
+.file-dropzone:hover {
+  background: #EBF5FC;
+  border-color: #0070AD;
+  transform: translateY(-1px);
+}
+
+.file-dropzone.dragging {
+  background: #E1F0FA;
+  border-color: #0070AD;
+  border-style: solid;
+  box-shadow: 0 0 0 4px rgba(0, 112, 173, 0.15);
+}
+
+.file-dropzone.has-file {
+  padding: 0.8rem;
+  background: #FFFFFF;
+  border: 1.5px solid #D6EEFF;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.dropzone-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.upload-icon {
+  width: 32px;
+  height: 32px;
+  stroke: #0070AD;
+  transition: transform 0.2s ease;
+}
+
+.file-dropzone:hover .upload-icon {
+  transform: scale(1.1);
+}
+
+.dropzone-placeholder span {
+  font-size: 0.85rem;
   font-weight: 600;
-  margin-left: 0.2rem;
-  transition: color 0.2s ease;
+  color: #1B2A4A;
 }
 
-.bottom-link a:hover {
-  color: #4DA8DA;
-  text-decoration: underline;
+.dropzone-hint {
+  font-size: 0.74rem !important;
+  color: #5A6B85 !important;
+  font-weight: 400 !important;
 }
+
+.image-preview {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #0070AD;
+  box-shadow: 0 4px 12px rgba(0, 112, 173, 0.2);
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #FFF3F3;
+  border: 1px solid #FACBCB;
+  color: #D9534F;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.remove-image-btn:hover {
+  background: #D9534F;
+  color: #FFFFFF;
+  transform: scale(1.1);
+}
+
 
 
 /* -----------------------------------------------

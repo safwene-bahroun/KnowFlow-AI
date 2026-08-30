@@ -20,8 +20,7 @@ import tn.knowflowai.backend.Entity.Department;
 import tn.knowflowai.backend.Service.DepartmentService;
 
 @RestController
-@RequestMapping("/api/admin/departments")
-@PreAuthorize("hasRole('ADMIN')")
+@RequestMapping({"/api/admin/departments", "/api/departments"})
 @CrossOrigin(origins = "http://localhost:4200")
 public class DepartmentController {
 
@@ -31,8 +30,9 @@ public class DepartmentController {
         this.departmentService = departmentService;
     }
 
-    // CREATE
+    // CREATE (Admin only)
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Department> create(
             @RequestBody Department department) {
 
@@ -44,16 +44,15 @@ public class DepartmentController {
                 .body(createdDepartment);
     }
 
-    // GET ALL
+    // GET ALL (All authenticated users)
     @GetMapping
     public ResponseEntity<List<Department>> getAll() {
-
         return ResponseEntity.ok(
                 departmentService.getAll()
         );
     }
 
-    // GET BY ID
+    // GET BY ID (All authenticated users)
     @GetMapping("/{id}")
     public ResponseEntity<Department> getById(
             @PathVariable Long id) {
@@ -83,8 +82,9 @@ public class DepartmentController {
         );
     }
 
-    // UPDATE
+    // UPDATE (Admin only)
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Department> update(
             @PathVariable Long id,
             @RequestBody Department department) {
@@ -94,8 +94,9 @@ public class DepartmentController {
         );
     }
 
-    // DELETE
+    // DELETE (Admin only)
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @PathVariable Long id) {
 

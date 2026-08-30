@@ -188,7 +188,8 @@ public class DocumentService {
             case COMPANY -> user.getRole() == Role.EMPLOYEE ||
                     user.getRole() == Role.MANAGER;
             case MANAGERS_ONLY -> user.getRole() == Role.MANAGER;
-            case PUBLIC -> user.getRole() == Role.EMPLOYEE;
+            case PUBLIC -> user.getRole() == Role.EMPLOYEE ||
+                    user.getRole() == Role.MANAGER;
         };
     }
 

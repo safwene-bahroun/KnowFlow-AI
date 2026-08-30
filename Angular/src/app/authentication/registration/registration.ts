@@ -331,78 +331,75 @@ export class Registration implements OnInit {
 
 
   // ==========================================
-  // FILE HANDLING
+  // DRAG AND DROP & FILE HANDLING
   // ==========================================
 
-  onFileSelected(event: Event): void {
+  isDragging = false;
 
-    const input = event.target as HTMLInputElement;
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
 
-    if (!input.files || input.files.length === 0) {
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
 
-      return;
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
 
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      this.processFile(event.dataTransfer.files[0]);
     }
+  }
 
-    const file: File = input.files[0];
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    this.processFile(input.files[0]);
+  }
 
-
-    // ----------------------------------------
-    // SIZE CHECK (5MB max)
-    // ----------------------------------------
+  private processFile(file: File): void {
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Please upload a valid image file (PNG, JPG, WEBP).';
+      return;
+    }
 
     if (file.size > 5 * 1024 * 1024) {
-
       this.errorMessage = 'Image must be smaller than 5 MB.';
-
-      input.value = '';
-
       return;
-
     }
 
-
-    // ----------------------------------------
-    // READ AS BASE64 DATA URL
-    // ----------------------------------------
-
     const reader = new FileReader();
-
     reader.onload = () => {
-
       const dataUrl = reader.result as string;
-
       this.imagePreview = dataUrl;
-
       this.registerForm.patchValue({
         urlImage: dataUrl
       });
-
       this.errorMessage = '';
-
     };
 
     reader.onerror = () => {
-
       this.errorMessage = 'Failed to read the image file.';
-
     };
 
     reader.readAsDataURL(file);
-
   }
 
-  removeImage(event: Event): void {
-
-    event.stopPropagation();
-
+  removeImage(event?: Event): void {
+    if (event) event.stopPropagation();
     this.imagePreview = null;
-
     this.registerForm.patchValue({
       urlImage: ''
     });
-
   }
+
 
 
   // ===================================================

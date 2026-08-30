@@ -18,6 +18,7 @@ import {
   UserService,
   type User as ApiUser,
   type Role,
+  type EmployeeProfile,
   type Department as ApiDepartment
 } from '../../../Services/user-service';
 
@@ -61,6 +62,8 @@ export class Users implements OnInit {
 
   imageFile: File | null = null;
   imagePreview: string | null = null;
+  imageBase64: string | null = null;
+  isDragging = false;
 
   userForm = this.fb.group({
     name: ['', Validators.required],
@@ -108,10 +111,11 @@ export class Users implements OnInit {
   loadDepartments(): void {
     this.userService.getAllDepartments().subscribe({
       next: (deps) => {
-        this.departments = deps;
+        this.departments = deps || [];
+        this.changeDetector.markForCheck();
       },
       error: (err) => {
-        console.error('Failed to load departments', err);
+        console.error('Failed to load departments from database', err);
       }
     });
   }
@@ -119,6 +123,7 @@ export class Users implements OnInit {
   getUserImage(user: UserRecord): string | null {
     const image = user?.urlImage ?? user?.imageUrl ?? user?.photo ?? user?.profileImage ?? null;
     if (!image || !image.trim()) return null;
+    if (image.startsWith('data:image')) return image;
     return /^https?:\/\//i.test(image)
       ? image
       : `http://localhost:3000${image.startsWith('/') ? '' : '/'}${image}`;
@@ -134,22 +139,58 @@ export class Users implements OnInit {
     return user?.department?.name ?? user?.departmentName ?? '-';
   }
 
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      this.processFile(event.dataTransfer.files[0]);
+    }
+  }
+
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
+    this.processFile(input.files[0]);
+  }
 
-    const file = input.files[0];
+  private processFile(file: File): void {
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file.');
+      alert('Please upload a valid image file (PNG, JPG, WEBP).');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image must be less than 5MB.');
+      alert('Image file size must be less than 5MB.');
       return;
     }
 
     this.imageFile = file;
-    this.imagePreview = URL.createObjectURL(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imageBase64 = reader.result as string;
+      this.imagePreview = this.imageBase64;
+      this.changeDetector.markForCheck();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.imageFile = null;
+    this.imagePreview = null;
+    this.imageBase64 = '';
   }
 
   loadUsers(): void {
@@ -157,20 +198,18 @@ export class Users implements OnInit {
     this.errorMessage = '';
     this.userService.getAll().subscribe({
       next: (users: ApiUser[]) => {
-        this.users = users as UserRecord[];
+        this.users = (users || []) as UserRecord[];
         this.loading = false;
         this.changeDetector.markForCheck();
       },
       error: err => {
         console.error(err);
-
         if (err.status === 403) {
           this.errorMessage = 'Access denied. Your account is not allowed to view admin users.';
           this.users = [];
         } else {
           this.errorMessage = 'Unable to load users.';
         }
-
         this.loading = false;
         this.changeDetector.markForCheck();
       }
@@ -186,13 +225,15 @@ export class Users implements OnInit {
     this.loading = true;
     this.userService.search(keyword).subscribe({
       next: (users: ApiUser[]) => {
-        this.users = users as UserRecord[];
+        this.users = (users || []) as UserRecord[];
         this.loading = false;
+        this.changeDetector.markForCheck();
       },
       error: err => {
         console.error(err);
         this.errorMessage = 'Unable to search users.';
         this.loading = false;
+        this.changeDetector.markForCheck();
       }
     });
   }
@@ -205,13 +246,15 @@ export class Users implements OnInit {
     this.loading = true;
     this.userService.getByRole(this.selectedRole as Role).subscribe({
       next: (users: ApiUser[]) => {
-        this.users = users as UserRecord[];
+        this.users = (users || []) as UserRecord[];
         this.loading = false;
+        this.changeDetector.markForCheck();
       },
       error: err => {
         console.error(err);
         this.errorMessage = 'Unable to filter users.';
         this.loading = false;
+        this.changeDetector.markForCheck();
       }
     });
   }
@@ -236,8 +279,9 @@ export class Users implements OnInit {
     });
     this.imageFile = null;
     this.imagePreview = null;
+    this.imageBase64 = null;
 
-    this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(8)]);
+    this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
     this.userForm.get('password')?.updateValueAndValidity();
   }
 
@@ -245,6 +289,7 @@ export class Users implements OnInit {
     this.loadingUser = true;
     this.imageFile = null;
     this.imagePreview = null;
+    this.imageBase64 = null;
 
     this.userService.getById(id).subscribe({
       next: (user: ApiUser) => {
@@ -268,17 +313,19 @@ export class Users implements OnInit {
         });
 
         if (userRecord.urlImage) {
-          this.imagePreview = userRecord.urlImage;
+          this.imagePreview = this.getUserImage(userRecord);
         }
 
         this.userForm.get('password')?.clearValidators();
         this.userForm.get('password')?.updateValueAndValidity();
         this.loadingUser = false;
+        this.changeDetector.markForCheck();
       },
       error: err => {
         console.error(err);
         this.errorMessage = 'Unable to load user.';
         this.loadingUser = false;
+        this.changeDetector.markForCheck();
       }
     });
   }
@@ -293,49 +340,57 @@ export class Users implements OnInit {
     this.errorMessage = '';
 
     const value = this.userForm.getRawValue();
-    const formData = new FormData();
 
-    formData.append('name', value.name!);
-    formData.append('familyName', value.familyName!);
-    formData.append('email', value.email!);
-    formData.append('cin', value.cin || '');
-    formData.append('role', value.role!);
-    formData.append('enabled', String(value.enabled ?? true));
+    const userPayload: ApiUser & { enabled?: boolean } = {
+      name: value.name!,
+      familyName: value.familyName!,
+      email: value.email!,
+      cin: value.cin || '',
+      phoneNumber: value.phoneNumber || '',
+      address: value.address || '',
+      age: value.age != null ? Number(value.age) : undefined,
+      gender: value.gender || undefined,
+      role: value.role as Role,
+      employeeProfile: value.employeeProfile ? (value.employeeProfile as EmployeeProfile) : undefined,
+      department: value.departmentId ? { id: Number(value.departmentId), name: '' } : undefined,
+      enabled: value.enabled ?? true
+    };
 
-    if (value.password) formData.append('password', value.password);
-    if (value.phoneNumber) formData.append('phoneNumber', value.phoneNumber);
-    if (value.address) formData.append('address', value.address);
-    if (value.age != null) formData.append('age', String(value.age));
-    if (value.gender) formData.append('gender', value.gender);
-    if (value.employeeProfile) formData.append('employeeProfile', value.employeeProfile);
-    if (value.departmentId != null) formData.append('departmentId', String(value.departmentId));
-    if (this.imageFile) formData.append('image', this.imageFile);
+    if (this.imageBase64 !== null) {
+      userPayload.urlImage = this.imageBase64;
+    }
+
+    if (this.mode === 'add' || (value.password && value.password.trim())) {
+      userPayload.password = value.password!;
+    }
 
     if (this.mode === 'add') {
-      this.userService.createWithImage(formData).subscribe({
+      this.userService.create(userPayload as ApiUser).subscribe({
         next: () => {
           this.loading = false;
           this.router.navigate(['/admin/users']);
         },
         error: err => {
           console.error(err);
-          this.errorMessage = err?.error?.message || 'Unable to create user.';
+          this.errorMessage = err?.error?.message || err?.error || 'Unable to create user.';
           this.loading = false;
+          this.changeDetector.markForCheck();
         }
       });
       return;
     }
 
     if (this.mode === 'edit' && this.userId) {
-      this.userService.updateWithImage(this.userId, formData).subscribe({
+      this.userService.update(this.userId, userPayload as ApiUser).subscribe({
         next: () => {
           this.loading = false;
           this.router.navigate(['/admin/users']);
         },
         error: err => {
           console.error(err);
-          this.errorMessage = err?.error?.message || 'Unable to update user.';
+          this.errorMessage = err?.error?.message || err?.error || 'Unable to update user.';
           this.loading = false;
+          this.changeDetector.markForCheck();
         }
       });
     }
@@ -355,6 +410,7 @@ export class Users implements OnInit {
     this.userService.delete(id).subscribe({
       next: () => {
         this.users = this.users.filter(u => u.id !== id);
+        this.changeDetector.markForCheck();
       },
       error: err => {
         console.error(err);
@@ -372,4 +428,4 @@ export class Users implements OnInit {
     this.selectedRole = '';
     this.loadUsers();
   }
-}
+}

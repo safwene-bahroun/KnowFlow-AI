@@ -16,8 +16,8 @@ from app.services.ingestion_service import (
     IngestionService
 )
 
-from app.services.spring_client import (
-    SpringClient
+from app.repositories.vector_repository import (
+    VectorRepository
 )
 
 
@@ -33,65 +33,45 @@ document_bp = Blueprint(
 )
 @require_internal_key
 def ingest_document():
-
     try:
-
         data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON payload provided"}), 400
 
-        document_data = (
-            DocumentSchema.validate(
-                data
-            )
-        )
+        document_data = DocumentSchema.validate(data)
 
-        ingestion_service = (
-            IngestionService()
-        )
-
-        SpringClient.update_document_status(
-            document_data[
-                "document_id"
-            ],
-            "PROCESSING"
-        )
-
-        result = (
-            ingestion_service
-            .process_document(
-                document_data
-            )
-        )
-
-        SpringClient.save_chunks(
-            document_data[
-                "document_id"
-            ],
-            result["chunks"]
-        )
-
-        SpringClient.update_document_status(
-            document_data[
-                "document_id"
-            ],
-            "PROCESSED"
-        )
+        result = IngestionService.ingest_document(document_data)
 
         return jsonify({
-            "message":
-            "Document processed successfully",
-
-            "document_id":
-            result["document_id"],
-
-            "chunk_count":
-            len(
-                result["chunks"]
-            )
+            "message": "Document processed successfully",
+            "document_id": result["document_id"],
+            "chunk_count": result["chunk_count"]
         }), 200
 
-    except Exception as error:
-
+    except ValueError as error:
         return jsonify({
-            "error":
-            str(error)
+            "error": str(error)
+        }), 400
+
+    except Exception as error:
+        return jsonify({
+            "error": str(error)
+        }), 500
+
+
+@document_bp.route(
+    "/<int:document_id>",
+    methods=["DELETE"]
+)
+@require_internal_key
+def delete_document_vectors(document_id):
+    try:
+        VectorRepository.delete_document(document_id)
+        return jsonify({
+            "message": f"Vectors for document {document_id} deleted successfully",
+            "document_id": document_id
+        }), 200
+    except Exception as error:
+        return jsonify({
+            "error": str(error)
         }), 500

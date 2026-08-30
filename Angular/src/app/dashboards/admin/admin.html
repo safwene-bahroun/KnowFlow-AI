@@ -39,7 +39,7 @@
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <span class="icon">⌂</span>
+        <span class="icon">🏠︎</span>
         <span class="label">Dashboard</span>
       </a>
 
@@ -69,7 +69,14 @@
         <span class="icon">📄</span>
         <span class="label">Documents</span>
       </a>
-
+         <a
+        routerLink="/admin/log"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+      >
+        <span class="icon">🗃️</span>
+        <span class="label">log</span>
+      </a>
       <a
         routerLink="/admin/notifications"
         routerLinkActive="active"
@@ -111,7 +118,7 @@
         (click)="logout()"
         class="logout-btn"
       >
-        <span class="icon">⎋</span>
+        <span class="icon">[←  </span>
         <span class="label">Logout</span>
       </button>
 
@@ -218,7 +225,7 @@
             type="button"
             (click)="logout()"
           >
-            <span>⎋</span>
+            <span>[←   </span>
             <span>Logout</span>
           </button>
         </div>

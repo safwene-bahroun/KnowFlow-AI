@@ -20,6 +20,7 @@ export class SetingProfile implements OnInit {
 
   getProfileImageUrl(url: string | null | undefined): string | null {
     if (!url || !url.trim()) return null;
+    if (url.startsWith('data:image')) return url;
     return /^https?:\/\//i.test(url)
       ? url
       : `http://localhost:3000${url.startsWith('/') ? '' : '/'}${url}`;
@@ -30,6 +31,10 @@ export class SetingProfile implements OnInit {
   errorMessage = '';
   successMessage = '';
   imagePreview: string | null = null;
+  isDragging = false;
+  userDepartment = '-';
+  userRole = '';
+  userProfileTitle = '';
   private imageData: string | undefined;
 
   profileForm = this.fb.nonNullable.group({
@@ -56,13 +61,38 @@ export class SetingProfile implements OnInit {
     });
   }
 
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      this.processFile(event.dataTransfer.files[0]);
+    }
+  }
+
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    this.processFile(file);
+  }
 
+  private processFile(file: File): void {
     if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
-      this.errorMessage = 'Choose an image smaller than 5 MB.';
+      this.errorMessage = 'Please choose a valid image (PNG, JPG, WEBP) smaller than 5 MB.';
       return;
     }
 
@@ -70,9 +100,15 @@ export class SetingProfile implements OnInit {
     reader.onload = () => {
       this.imageData = reader.result as string;
       this.imagePreview = this.imageData;
+      this.errorMessage = '';
       this.cdr.markForCheck();
     };
     reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.imageData = '';
+    this.imagePreview = null;
   }
 
   save(): void {
@@ -112,7 +148,11 @@ export class SetingProfile implements OnInit {
       address: user.address || ''
     });
     this.imagePreview = this.getProfileImageUrl(user.urlImage);
+    this.userDepartment = user.departmentName || 'General';
+    this.userRole = user.role || '';
+    this.userProfileTitle = user.employeeProfile || '';
     this.imageData = undefined;
   }
 
 }
+
