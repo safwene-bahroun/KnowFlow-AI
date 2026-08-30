@@ -34,43 +34,44 @@ def ask_question():
 
         data = request.get_json()
 
-        rag_data = (
-            RagSchema.validate(
-                data
-            )
+        print("====================================")
+        print("FLASK RAG /QUERY CALLED")
+        print("Received data:", data)
+        print("====================================")
+
+        rag_data = RagSchema.validate(data)
+
+        allowed_document_ids = rag_data[
+            "allowed_document_ids"
+        ]
+
+        print(
+            "Authorized documents:",
+            allowed_document_ids
         )
 
-        rag_service = (
-            RagService()
+        rag_service = RagService()
+
+        result = rag_service.ask(
+            question=rag_data["question"],
+            allowed_document_ids=allowed_document_ids
         )
 
-        result = (
-            rag_service.ask(
-
-                question=
-                rag_data["question"],
-
-                allowed_document_ids=
-                rag_data[
-                    "allowed_document_ids"
-                ]
-            )
-        )
-
-        return jsonify(
-            result
-        ), 200
+        return jsonify(result), 200
 
     except ValueError as error:
 
         return jsonify({
-            "error":
-            str(error)
+            "error": str(error)
         }), 400
 
     except Exception as error:
 
+        print(
+            "FLASK RAG ERROR:",
+            error
+        )
+
         return jsonify({
-            "error":
-            str(error)
+            "error": str(error)
         }), 500

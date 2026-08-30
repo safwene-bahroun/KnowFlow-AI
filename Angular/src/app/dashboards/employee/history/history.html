@@ -1,0 +1,108 @@
+<aside class="history-sidebar">
+
+  <!-- Header -->
+  <div class="history-header">
+    <div class="header-left">
+      <span class="header-icon">💬</span>
+      <h3>History</h3>
+    </div>
+    <span
+      class="conversation-count"
+      *ngIf="conversations.length > 0"
+    >
+      {{ conversations.length }}
+    </span>
+  </div>
+
+
+  <!-- Loading State -->
+  <div
+    class="history-loading"
+    *ngIf="loading && conversations.length === 0"
+  >
+    <div class="loading-spinner"></div>
+    <span>Loading conversations...</span>
+  </div>
+
+
+  <!-- Error Message -->
+  <div
+    class="history-error"
+    *ngIf="errorMessage"
+  >
+    <span class="error-icon">⚠️</span>
+    <span>{{ errorMessage }}</span>
+    <button
+      type="button"
+      class="retry-btn"
+      (click)="loadConversations()"
+    >
+      Retry
+    </button>
+  </div>
+
+
+  <!-- Conversation List -->
+  <div
+    class="conversation-list"
+    *ngIf="!loading || conversations.length > 0"
+  >
+    <div
+      class="conversation-item"
+      *ngFor="let conversation of conversations"
+      [class.active]="conversation.id === selectedConversationId"
+      (click)="selectConversation(conversation)"
+    >
+      <div class="conversation-icon">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      </div>
+
+      <span class="conversation-title">{{ conversation.title }}</span>
+
+      <button
+        type="button"
+        class="delete-button"
+        (click)="deleteConversation(conversation, $event)"
+        aria-label="Delete conversation"
+        title="Delete"
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+      </button>
+    </div>
+
+
+    <!-- Empty State -->
+    <div
+      class="empty-state"
+      *ngIf="conversations.length === 0 && !loading"
+    >
+      <div class="empty-icon">📭</div>
+      <p class="empty-title">No conversations yet</p>
+      <p class="empty-subtitle">Start a chat to see your history here</p>
+    </div>
+  </div>
+
+</aside>

@@ -30,7 +30,7 @@
       </a>
 
           <a
-        routerLink="/employee/history"
+        routerLink="/employee/history/conversations"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: false }"
       >
@@ -50,7 +50,7 @@
 
 
     <div class="sidebar-footer">
-      <a routerLink="/admin/settings/profile" class="profile-summary">
+      <a routerLink="/employee/settings/profile" class="profile-summary">
         <img
           *ngIf="getProfileImageUrl(currentUser?.urlImage) as imageUrl"
           [src]="imageUrl"
@@ -98,7 +98,7 @@
       </div>
 
       <div class="topbar-profile" [class.menu-open]="profileMenuOpen">
-        <a routerLink="/admin/notifications" class="notification-link" aria-label="Notifications">
+        <a routerLink="/employee/notifications" class="notification-link" aria-label="Notifications">
           <span class="notification-bell" aria-hidden="true">🔔</span>
           <span *ngIf="unreadNotifications > 0" class="notification-badge">
             {{ unreadNotifications > 99 ? '99+' : unreadNotifications }}
@@ -111,8 +111,8 @@
         </button>
 
         <div class="profile-menu" *ngIf="profileMenuOpen">
-          <a routerLink="/admin/notifications" (click)="closeProfileMenu()">🔔 Notifications <strong *ngIf="unreadNotifications">{{ unreadNotifications }}</strong></a>
-          <a routerLink="/admin/settings/profile" (click)="closeProfileMenu()">⚙️ Profile settings </a>
+          <a routerLink="/employee/notifications" (click)="closeProfileMenu()">🔔 Notifications <strong *ngIf="unreadNotifications">{{ unreadNotifications }}</strong></a>
+          <a routerLink="/employee/settings/profile" (click)="closeProfileMenu()">⚙️ Profile settings </a>
           <button type="button" (click)="logout()">[←  Logout</button>
         </div>
       </div>

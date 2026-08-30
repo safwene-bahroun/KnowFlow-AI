@@ -20,32 +20,53 @@ import tn.knowflowai.backend.Service.CustomUserDetailsService;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomUserDetailsService userDetailsService;
+    private final
+    JwtAuthenticationFilter
+            jwtAuthenticationFilter;
+
+    private final
+    InternalApiKeyFilter
+            internalApiKeyFilter;
+
+    private final
+    CustomUserDetailsService
+            userDetailsService;
+
 
     public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter,
-            CustomUserDetailsService userDetailsService
+
+            JwtAuthenticationFilter
+                    jwtAuthenticationFilter,
+
+            InternalApiKeyFilter
+                    internalApiKeyFilter,
+
+            CustomUserDetailsService
+                    userDetailsService
+
     ) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.userDetailsService = userDetailsService;
+
+        this.jwtAuthenticationFilter =
+                jwtAuthenticationFilter;
+
+        this.internalApiKeyFilter =
+                internalApiKeyFilter;
+
+        this.userDetailsService =
+                userDetailsService;
     }
 
-    // =========================================================
-    // PASSWORD ENCODER
-    // =========================================================
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 
-    // =========================================================
-    // AUTHENTICATION PROVIDER
-    // =========================================================
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider
+    authenticationProvider() {
 
         DaoAuthenticationProvider provider =
                 new DaoAuthenticationProvider();
@@ -61,114 +82,99 @@ public class SecurityConfig {
         return provider;
     }
 
-    // =========================================================
-    // AUTHENTICATION MANAGER
-    // =========================================================
 
     @Bean
-    public AuthenticationManager authenticationManager(
+    public AuthenticationManager
+    authenticationManager(
+
             AuthenticationConfiguration configuration
+
     ) throws Exception {
 
-        return configuration.getAuthenticationManager();
+        return configuration
+                .getAuthenticationManager();
     }
 
-    // =========================================================
-    // SECURITY FILTER CHAIN
-    // =========================================================
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
+    public SecurityFilterChain
+    securityFilterChain(
+
             HttpSecurity http
+
     ) throws Exception {
 
         http
 
-            // -------------------------------------------------
-            // CSRF
-            // -------------------------------------------------
-
-            .csrf(csrf ->
-                csrf.disable()
+            .csrf(
+                    csrf -> csrf.disable()
             )
 
-            // -------------------------------------------------
-            // CORS
-            // -------------------------------------------------
-
-            .cors(cors -> {})
-
-            // -------------------------------------------------
-            // SESSION
-            // -------------------------------------------------
-
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
+            .cors(
+                    cors -> {}
             )
 
-            // -------------------------------------------------
-            // AUTHENTICATION PROVIDER
-            // -------------------------------------------------
+            .sessionManagement(
+                    session ->
+                            session.sessionCreationPolicy(
+                                    SessionCreationPolicy.STATELESS
+                            )
+            )
 
             .authenticationProvider(
-                authenticationProvider()
+                    authenticationProvider()
             )
 
-            // -------------------------------------------------
-            // AUTHORIZATION
-            // -------------------------------------------------
+            .authorizeHttpRequests(
+                    auth -> auth
 
-            .authorizeHttpRequests(auth -> auth
+                            .requestMatchers(
+                                    "/api/auth/**"
+                            )
+                            .permitAll()
 
-                // =============================================
-                // PUBLIC AUTHENTICATION ENDPOINTS
-                // =============================================
+                            .requestMatchers(
+                                    "/api/internal/**"
+                            )
+                            .permitAll()
 
-                .requestMatchers(
-                    "/api/auth/**"
-                ).permitAll()
+                            .requestMatchers(
+                                    "/error"
+                            )
+                            .permitAll()
 
-                // =============================================
-                // SPRING ERROR ENDPOINT
-                // =============================================
+                            .requestMatchers(
+                                    "/images/**"
+                            )
+                            .permitAll()
 
-                .requestMatchers(
-                    "/error"
-                ).permitAll()
+                            .requestMatchers(
+                                    "/files/**"
+                            )
+                            .permitAll()
 
-                // =============================================
-                // PUBLIC IMAGES
-                // =============================================
-
-                .requestMatchers(
-                    "/images/**"
-                ).permitAll()
-
-                // =============================================
-                // PUBLIC FILE ACCESS
-                // =============================================
-
-                .requestMatchers(
-                    "/files/**"
-                ).permitAll()
-
-                // =============================================
-                // EVERYTHING ELSE REQUIRES JWT
-                // =============================================
-
-                .anyRequest().authenticated()
+                            .anyRequest()
+                            .authenticated()
             )
 
-            // -------------------------------------------------
-            // JWT FILTER
-            // -------------------------------------------------
+            /*
+             * Flask Internal API Key
+             */
 
             .addFilterBefore(
-                jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class
+                    internalApiKeyFilter,
+                    UsernamePasswordAuthenticationFilter.class
+            )
+
+            /*
+             * Angular JWT
+             */
+
+            .addFilterBefore(
+                    jwtAuthenticationFilter,
+                    UsernamePasswordAuthenticationFilter.class
             );
+
 
         return http.build();
     }

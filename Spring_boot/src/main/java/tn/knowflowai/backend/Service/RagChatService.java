@@ -13,73 +13,61 @@ import tn.knowflowai.backend.Entity.Enum.MessageRole;
 import tn.knowflowai.backend.Entity.Message;
 import tn.knowflowai.backend.Entity.User;
 
-
 @Service
 @Transactional
 public class RagChatService {
 
-    private final ChatConversationService
-            conversationService;
-
-    private final MessageService
-            messageService;
-
-    private final FlaskRagClient
-            flaskRagClient;
-
+    private final ChatConversationService conversationService;
+    private final MessageService messageService;
+    private final FlaskRagClient flaskRagClient;
 
     public RagChatService(
-
-            ChatConversationService
-                    conversationService,
-
-            MessageService
-                    messageService,
-
-            FlaskRagClient
-                    flaskRagClient
+            ChatConversationService conversationService,
+            MessageService messageService,
+            FlaskRagClient flaskRagClient
     ) {
-
-        this.conversationService =
-                conversationService;
-
-        this.messageService =
-                messageService;
-
-        this.flaskRagClient =
-                flaskRagClient;
+        this.conversationService = conversationService;
+        this.messageService = messageService;
+        this.flaskRagClient = flaskRagClient;
     }
 
-
     public RagChatResponse askQuestion(
-
             User user,
-
             Long conversationId,
-
             String question,
-
             List<Long> allowedDocumentIds
     ) {
 
-
+        /*
+         * Validate question
+         */
         if (
                 question == null ||
                 question.trim().isEmpty()
         ) {
-
             throw new IllegalArgumentException(
                     "Question cannot be empty"
             );
         }
 
-
-        ChatConversation conversation;
-
+        /*
+         * If null, convert to empty list.
+         *
+         * [] means:
+         * "User has no authorized documents."
+         *
+         * This does NOT mean:
+         * "User cannot use the AI."
+         */
+        if (allowedDocumentIds == null) {
+            allowedDocumentIds =
+                    Collections.emptyList();
+        }
 
         /*
-         * CREATE NEW CONVERSATION
+         * CREATE OR GET CONVERSATION
          */
+        ChatConversation conversation;
 
         if (conversationId == null) {
 
@@ -94,13 +82,7 @@ public class RagChatService {
                             conversation
                     );
 
-        }
-
-        /*
-         * EXISTING CONVERSATION
-         */
-
-        else {
+        } else {
 
             conversation =
                     conversationService
@@ -110,11 +92,9 @@ public class RagChatService {
                             );
         }
 
-
         /*
          * SAVE USER MESSAGE
          */
-
         Message userMessage =
                 new Message(
                         question.trim(),
@@ -126,59 +106,67 @@ public class RagChatService {
                 userMessage
         );
 
-
         /*
-         * NO DOCUMENT ACCESS
+         * CALL FLASK ALWAYS
+         *
+         * If documents exist:
+         *
+         * [1, 2, 5] → RAG
+         *
+         * If no documents:
+         *
+         * [] → normal LLM
          */
+        System.out.println(
+                "===================================="
+        );
 
-        if (
-                allowedDocumentIds == null ||
-                allowedDocumentIds.isEmpty()
-        ) {
+        System.out.println(
+                "CALLING FLASK RAG/LLM"
+        );
 
-            String answer =
-                    "You currently do not have access "
-                    + "to any documents. Please contact "
-                    + "the administrator to request "
-                    + "document access.";
+        System.out.println(
+                "User: " + user.getEmail()
+        );
 
+        System.out.println(
+                "Question: " + question.trim()
+        );
 
-            Message aiMessage =
-                    new Message(
-                            answer,
-                            MessageRole.AI,
-                            conversation
-                    );
+        System.out.println(
+                "Authorized documents: "
+                        + allowedDocumentIds
+        );
 
+        if (allowedDocumentIds.isEmpty()) {
 
-            messageService.create(
-                    aiMessage
+            System.out.println(
+                    "MODE: NORMAL LLM"
             );
 
+        } else {
 
-            return new RagChatResponse(
-                    conversation.getId(),
-                    answer,
-                    Collections.emptyList()
+            System.out.println(
+                    "MODE: RAG"
             );
         }
 
+        System.out.println(
+                "===================================="
+        );
 
         /*
          * CALL FLASK
          */
-
         FlaskRagResponse flaskResponse =
                 flaskRagClient.ask(
                         question.trim(),
                         allowedDocumentIds
                 );
 
-
         /*
          * SAVE AI MESSAGE
          */
-
         Message aiMessage =
                 new Message(
                         flaskResponse.getAnswer(),
@@ -186,26 +174,19 @@ public class RagChatService {
                         conversation
                 );
 
-
         messageService.create(
                 aiMessage
         );
 
-
         /*
-         * RETURN RESPONSE TO ANGULAR
+         * RETURN TO ANGULAR
          */
-
         return new RagChatResponse(
-
                 conversation.getId(),
-
                 flaskResponse.getAnswer(),
-
                 flaskResponse.getSourceDocumentIds()
         );
     }
-
 
     private String createTitle(
             String question
@@ -214,14 +195,9 @@ public class RagChatService {
         String cleanQuestion =
                 question.trim();
 
-
-        if (
-                cleanQuestion.length() <= 50
-        ) {
-
+        if (cleanQuestion.length() <= 50) {
             return cleanQuestion;
         }
-
 
         return cleanQuestion.substring(
                 0,

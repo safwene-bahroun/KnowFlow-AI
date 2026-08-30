@@ -15,7 +15,7 @@ class EmbeddingService:
             cls._embeddings = HuggingFaceEmbeddings(
                 model_name=Config.EMBEDDING_MODEL,
                 model_kwargs={
-                    "device": "cpu"
+                    "device": "cuda"
                 },
                 encode_kwargs={
                     "normalize_embeddings": True

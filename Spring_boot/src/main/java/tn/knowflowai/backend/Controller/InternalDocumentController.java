@@ -1,6 +1,7 @@
 package tn.knowflowai.backend.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,6 @@ import tn.knowflowai.backend.Entity.DocumentChunk;
 import tn.knowflowai.backend.Service.DocumentChunkService;
 import tn.knowflowai.backend.Service.DocumentService;
 
-
 @RestController
 @RequestMapping("/api/internal/documents")
 public class InternalDocumentController {
@@ -28,69 +28,80 @@ public class InternalDocumentController {
     private final DocumentService documentService;
 
     private final DocumentChunkService documentChunkService;
-private final String internalApiKey;
 
-   public InternalDocumentController(
+    private final String internalApiKey;
 
-        DocumentService documentService,
 
-        DocumentChunkService documentChunkService,
-        @Value("${internal.api.key}")
-        String internalApiKey
-) {
+    public InternalDocumentController(
 
-    this.documentService =
-            documentService;
+            DocumentService documentService,
 
-    this.documentChunkService =
-            documentChunkService;
+            DocumentChunkService documentChunkService,
 
-    this.internalApiKey =
-            internalApiKey;
-}
+            @Value("${app.internal-api-key:KNOWFLOW_SECRET_KEY}")
+            String internalApiKey
 
-    /*
-     * =====================================================
-     * SAVE DOCUMENT CHUNKS
-     * =====================================================
-     *
-     * POST
-     *
-     * /api/internal/documents/{documentId}/chunks
-     */
+    ) {
+
+        this.documentService =
+                documentService;
+
+        this.documentChunkService =
+                documentChunkService;
+
+        this.internalApiKey =
+                internalApiKey;
+    }
+
+
+    // =====================================================
+    // SAVE DOCUMENT CHUNKS
+    // =====================================================
 
     @PostMapping("/{documentId}/chunks")
     public ResponseEntity<?> saveChunks(
 
-            @PathVariable Long documentId,
+            @PathVariable
+            Long documentId,
 
-            @RequestBody SaveChunksRequest request,
+            @RequestBody
+            SaveChunksRequest request,
 
             @RequestHeader(
-                    "X-Internal-API-Key"
-            ) String apiKey
+                    value = "X-Internal-API-Key",
+                    required = false
+            )
+            String apiKey
+
     ) {
 
         validateInternalKey(
                 apiKey
         );
 
+
         Document document =
                 documentService.getById(
                         documentId
                 );
 
+
         List<DocumentChunk> chunks =
+
                 request.getChunks()
                         .stream()
                         .map(
+
                                 chunkRequest ->
+
                                         convertToEntity(
                                                 chunkRequest,
                                                 document
                                         )
+
                         )
                         .toList();
+
 
         documentChunkService
                 .replaceDocumentChunks(
@@ -98,8 +109,10 @@ private final String internalApiKey;
                         chunks
                 );
 
+
         return ResponseEntity.ok(
-                java.util.Map.of(
+
+                Map.of(
 
                         "message",
                         "Chunks saved successfully",
@@ -109,46 +122,49 @@ private final String internalApiKey;
 
                         "chunkCount",
                         chunks.size()
+
                 )
         );
     }
 
 
-    /*
-     * =====================================================
-     * UPDATE DOCUMENT STATUS
-     * =====================================================
-     *
-     * PUT
-     *
-     * /api/internal/documents/{documentId}/status
-     */
+    // =====================================================
+    // UPDATE DOCUMENT STATUS
+    // =====================================================
 
     @PutMapping("/{documentId}/status")
     public ResponseEntity<?> updateStatus(
 
-            @PathVariable Long documentId,
+            @PathVariable
+            Long documentId,
 
             @RequestBody
             UpdateDocumentStatusRequest request,
 
             @RequestHeader(
-                    "X-Internal-API-Key"
-            ) String apiKey
+                    value = "X-Internal-API-Key",
+                    required = false
+            )
+            String apiKey
+
     ) {
 
         validateInternalKey(
                 apiKey
         );
 
+
         Document document =
+
                 documentService.updateStatus(
                         documentId,
                         request.getStatus()
                 );
 
+
         return ResponseEntity.ok(
-                java.util.Map.of(
+
+                Map.of(
 
                         "message",
                         "Document status updated successfully",
@@ -157,24 +173,23 @@ private final String internalApiKey;
                         document.getId(),
 
                         "status",
-                        document.getStatus()
-                                .name()
+                        document.getStatus().name()
+
                 )
         );
     }
 
 
-    /*
-     * =====================================================
-     * CONVERT DTO TO ENTITY
-     * =====================================================
-     */
+    // =====================================================
+    // CONVERT CHUNK DTO
+    // =====================================================
 
     private DocumentChunk convertToEntity(
 
             ChunkRequest request,
 
             Document document
+
     ) {
 
         return new DocumentChunk(
@@ -190,25 +205,29 @@ private final String internalApiKey;
     }
 
 
-    /*
-     * =====================================================
-     * INTERNAL API SECURITY
-     * =====================================================
-     */
-private void validateInternalKey(
-        String apiKey
-) {
+    // =====================================================
+    // INTERNAL API KEY VALIDATION
+    // =====================================================
 
-    if (
-            apiKey == null ||
-            !internalApiKey.equals(
-                    apiKey
-            )
+    private void validateInternalKey(
+            String apiKey
     ) {
 
-        throw new SecurityException(
-                "Invalid internal API key"
-        );
+        if (
+
+                apiKey == null ||
+
+                apiKey.isBlank() ||
+
+                !internalApiKey.equals(
+                        apiKey
+                )
+
+        ) {
+
+            throw new SecurityException(
+                    "Invalid internal API key"
+            );
+        }
     }
-}
 }

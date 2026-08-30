@@ -196,38 +196,104 @@ export const routes: Routes = [
   },
 
 
-  // ==========================================
-  // MANAGER
-  // ==========================================
+ // ==========================================
+// MANAGER
+// ==========================================
 
-  {
-    path: 'manager',
+{
+  path: 'manager',
 
-    canActivate: [authGuard],
+  canActivate: [authGuard],
 
-    loadComponent: () =>
-      import('./dashboards/manager/manager')
-        .then(m => m.Manager),
+  loadComponent: () =>
+    import('./dashboards/manager/manager')
+      .then(m => m.Manager),
 
-    children: [
+  children: [
 
-      {
-        path: 'dashboard',
+    // --------------------------------------
+    // CHATBOT / MANAGER DASHBOARD
+    // URL: /manager/dashboard
+    // --------------------------------------
 
-        loadComponent: () =>
-          import('./dashboards/manager/manager')
-            .then(m => m.Manager)
-      },
+    {
+      path: 'dashboard',
 
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      }
+      loadComponent: () =>
+        import('./dashboards/manager/chat-bot/chat-bot')
+          .then(m => m.ChatBot)
+    },
 
-    ]
-  },
 
+    // --------------------------------------
+    // CHAT HISTORY
+    // URL: /manager/history/conversations
+    // --------------------------------------
+
+    {
+      path: 'history/conversations',
+
+      loadComponent: () =>
+        import('./dashboards/manager/history/history')
+          .then(m => m.History)
+    },
+
+
+    // --------------------------------------
+    // LOG
+    // URL: /manager/log
+    // --------------------------------------
+
+    {
+      path: 'log',
+
+      loadComponent: () =>
+        import('./dashboards/manager/log/log')
+          .then(m => m.Log)
+    },
+
+
+    // --------------------------------------
+    // NOTIFICATIONS
+    // URL: /manager/notifications
+    // --------------------------------------
+
+    {
+      path: 'notifications',
+
+      loadComponent: () =>
+        import('./dashboards/manager/notifications/notifications')
+          .then(m => m.Notifications)
+    },
+
+
+    // --------------------------------------
+    // PROFILE SETTINGS
+    // URL: /manager/settings/profile
+    // --------------------------------------
+
+    {
+      path: 'settings/profile',
+
+      loadComponent: () =>
+        import('./dashboards/manager/seting-profile/seting-profile')
+          .then(m => m.SetingProfile)
+    },
+
+
+    // --------------------------------------
+    // DEFAULT MANAGER ROUTE
+    // /manager -> /manager/dashboard
+    // --------------------------------------
+
+    {
+      path: '',
+      redirectTo: 'dashboard',
+      pathMatch: 'full'
+    }
+
+  ]
+},
 
   // ==========================================
   // EMPLOYEE
@@ -279,7 +345,6 @@ export const routes: Routes = [
       // URL:
       // /employee/settings/profile
       // --------------------------------------
-
       {
         path: 'settings/profile',
 
@@ -287,6 +352,15 @@ export const routes: Routes = [
           import('./dashboards/employee/seting-profile/seting-profile')
             .then(m => m.SetingProfile)
       },
+
+ {
+        path: 'history/conversations',
+
+        loadComponent: () =>
+          import('./dashboards/employee/history/history')
+            .then(m => m.History)
+      },
+
 
 
       // --------------------------------------

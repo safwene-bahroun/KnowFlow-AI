@@ -63,6 +63,7 @@ C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\ba
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Repository\PasswordResetTokenRepository.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Repository\UserRepository.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Security\CorsConfig.java
+C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Security\InternalApiKeyFilter.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Security\JwtAuthenticationFilter.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Security\SecurityConfig.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Service\AuthService.java
