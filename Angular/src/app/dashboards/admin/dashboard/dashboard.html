@@ -1,1 +1,53 @@
-<p>dashboard works!</p>
+<div class="dashboard-page">
+	<section class="dashboard-heading">
+		<div>
+			<p class="eyebrow">Workspace overview</p>
+			<h1>Good morning, admin.</h1>
+			<p class="heading-copy">A live view of your knowledge platform and the work that needs attention.</p>
+		</div>
+		<a class="primary-btn" routerLink="/admin/documents/add"><span aria-hidden="true">+</span> Add document</a>
+	</section>
+
+	<div *ngIf="isLoading" class="state-message">Loading your workspace overview...</div>
+	<div *ngIf="hasLoadError" class="state-message error-state">Some dashboard data could not be loaded. Refresh to try again.</div>
+
+	<ng-container *ngIf="!isLoading">
+		<section class="metric-grid" aria-label="Platform statistics">
+			<a *ngFor="let metric of metrics" class="metric-card" [class]="'tone-' + metric.tone" [routerLink]="metric.link">
+				<div class="metric-top"><span>{{ metric.label }}</span><b>{{ metric.icon }}</b></div>
+				<strong>{{ metric.value | number }}</strong>
+				<small>{{ metric.detail }}</small>
+			</a>
+		</section>
+
+		<section class="dashboard-grid">
+			<article class="panel">
+				<div class="panel-heading"><div><p class="eyebrow">Content health</p><h2>Document status</h2></div><a routerLink="/admin/documents">View all <span aria-hidden="true">&#8599;</span></a></div>
+				<div class="status-list">
+					<div *ngFor="let item of statusItems" class="status-row">
+						<span class="status-label"><i [class]="'status-dot ' + item.tone"></i>{{ item.label }}</span>
+						<div class="progress-track"><span [class]="'progress-fill ' + item.tone" [style.width.%]="documents.length ? countStatus(item.key) / documents.length * 100 : 0"></span></div>
+						<strong>{{ countStatus(item.key) }}</strong>
+					</div>
+				</div>
+			</article>
+
+			<article class="panel">
+				<div class="panel-heading"><div><p class="eyebrow">Access control</p><h2>Visibility split</h2></div></div>
+				<div class="visibility-list">
+					<div *ngFor="let item of visibilityItems" class="visibility-row"><span>{{ item.label }}</span><strong>{{ countVisibility(item.key) }}</strong></div>
+				</div>
+			</article>
+		</section>
+
+		<section class="panel recent-panel">
+			<div class="panel-heading"><div><p class="eyebrow">Latest activity</p><h2>Recently added documents</h2></div><a routerLink="/admin/documents">Manage documents <span aria-hidden="true">&#8599;</span></a></div>
+			<div *ngIf="recentDocuments.length; else noDocuments" class="recent-table-wrap">
+				<table><thead><tr><th>Document</th><th>Owner</th><th>Visibility</th><th>Status</th><th>Added</th></tr></thead>
+					<tbody><tr *ngFor="let document of recentDocuments"><td><span class="file-mark">&#9635;</span><strong>{{ document.name }}</strong></td><td>{{ getDocumentAuthor(document) }}</td><td>{{ document.visibility | titlecase }}</td><td><span [class]="'status-pill ' + document.status.toLowerCase()">{{ document.status | titlecase }}</span></td><td>{{ document.createdAt ? (document.createdAt | date:'MMM d, y') : '-' }}</td></tr></tbody>
+				</table>
+			</div>
+			<ng-template #noDocuments><div class="empty-state"><span>&#9635;</span><h3>No documents yet</h3><p>Upload your first document to start building the knowledge base.</p><a routerLink="/admin/documents/add">Add a document</a></div></ng-template>
+		</section>
+	</ng-container>
+</div>

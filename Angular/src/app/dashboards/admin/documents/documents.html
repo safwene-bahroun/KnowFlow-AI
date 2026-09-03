@@ -1,6 +1,9 @@
 <div class="document-container">
 
-  <h2>Documents</h2>
+  <div class="page-heading">
+    <h2>Documents</h2>
+    <button type="button" class="primary-btn" (click)="openCreateForm()">+ Add Document</button>
+  </div>
 
   <!-- CURRENT USER BANNER -->
   <div class="current-user-banner" *ngIf="currentUser">
@@ -46,7 +49,7 @@
   </div>
 
   <!-- ===================== FORM ===================== -->
-  <div class="document-form">
+  <div class="document-form" *ngIf="showForm">
     <h3>{{ isEditing ? 'Edit Document' : 'Add Document' }}</h3>
 
     <form [formGroup]="documentForm"

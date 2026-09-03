@@ -5,9 +5,17 @@ import {
 
 import {
   FormBuilder,
+  AbstractControl,
+  ValidationErrors,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
+
+function passwordsMatch(control: AbstractControl): ValidationErrors | null {
+  return control.get('password')?.value === control.get('confirmPassword')?.value
+    ? null
+    : { passwordsMismatch: true };
+}
 
 import {
   ActivatedRoute,
@@ -42,6 +50,13 @@ export class ResetPassword{
 
   errorMessage = '';
   successMessage = '';
+  passwordVisible = false;
+  confirmPasswordVisible = false;
+
+  togglePasswordVisibility(field: 'password' | 'confirmPassword'): void {
+    if (field === 'password') this.passwordVisible = !this.passwordVisible;
+    else this.confirmPasswordVisible = !this.confirmPasswordVisible;
+  }
 
   resetForm = this.fb.nonNullable.group({
 
@@ -49,7 +64,7 @@ export class ResetPassword{
       '',
       [
         Validators.required,
-        Validators.minLength(8),
+        Validators.minLength(6),
         Validators.pattern(
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/
         )
@@ -61,7 +76,7 @@ export class ResetPassword{
       Validators.required
     ]
 
-  });
+  }, { validators: passwordsMatch });
 
 
   constructor() {

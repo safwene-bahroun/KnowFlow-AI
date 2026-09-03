@@ -13,20 +13,25 @@ import java.util.List;
 public class FeedbackService {
 
     private final FeedbackRepository repository;
+    private final NotificationService notificationService;
 
     public FeedbackService(
-            FeedbackRepository repository
+            FeedbackRepository repository,
+            NotificationService notificationService
     ) {
         this.repository = repository;
+        this.notificationService = notificationService;
     }
 
     public Feedback create(Feedback feedback) {
-        return repository.save(feedback);
+        Feedback saved = repository.save(feedback);
+        notificationService.notifyFeedbackReceived(saved);
+        return saved;
     }
 
     @Transactional(readOnly = true)
     public List<Feedback> getAll() {
-        return repository.findAll();
+        return repository.findAllWithContext();
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +80,9 @@ public class FeedbackService {
         feedback.setType(updated.getType());
         feedback.setComment(updated.getComment());
 
-        return repository.save(feedback);
+        Feedback saved = repository.save(feedback);
+        notificationService.notifyFeedbackReceived(saved);
+        return saved;
     }
 
     public void delete(Long id) {

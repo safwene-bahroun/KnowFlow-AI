@@ -22,15 +22,18 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public DocumentService(
             DocumentRepository documentRepository,
             DepartmentRepository departmentRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            NotificationService notificationService
     ) {
         this.documentRepository = documentRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     // CREATE
@@ -38,7 +41,9 @@ public class DocumentService {
         document.setCreatedBy(findUser(currentUserEmail));
         document.setDepartment(resolveDepartment(document.getDepartment()));
         applyVisibilityRules(document);
-        return documentRepository.save(document);
+        Document saved = documentRepository.save(document);
+        notificationService.notifyDocumentChange(saved, false);
+        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -137,7 +142,9 @@ public class DocumentService {
         document.setDepartment(resolveDepartment(updatedDocument.getDepartment()));
         applyVisibilityRules(document);
 
-        return documentRepository.save(document);
+        Document saved = documentRepository.save(document);
+        notificationService.notifyDocumentChange(saved, true);
+        return saved;
     }
 
     // UPDATE STATUS
@@ -150,7 +157,9 @@ public class DocumentService {
 
         document.setStatus(status);
 
-        return documentRepository.save(document);
+        Document saved = documentRepository.save(document);
+        notificationService.notifyDocumentChange(saved, true);
+        return saved;
     }
 
     // UPDATE VISIBILITY
@@ -166,7 +175,9 @@ public class DocumentService {
         document.setDepartment(resolveDepartment(departmentId));
         applyVisibilityRules(document);
 
-        return documentRepository.save(document);
+        Document saved = documentRepository.save(document);
+        notificationService.notifyDocumentChange(saved, true);
+        return saved;
     }
 
     private boolean canView(Document document, User user) {

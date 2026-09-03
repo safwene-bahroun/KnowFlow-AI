@@ -65,9 +65,9 @@ public class RegisterRequest {
 
     @NotBlank(message = "Password is required")
     @Size(
-        min = 8,
+        min = 6,
         max = 100,
-        message = "Password must contain between 8 and 100 characters"
+        message = "Password must contain between 6 and 100 characters"
     )
     @Pattern(
         regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).+$",

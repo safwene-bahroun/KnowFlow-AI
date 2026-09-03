@@ -545,6 +545,28 @@
   box-shadow: 0 0 0 3px rgba(0, 112, 173, 0.12);
 }
 
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-field input {
+  padding-right: 4.2rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.65rem;
+  border: 0;
+  background: transparent;
+  color: #0070AD;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .form-group input.ng-invalid.ng-touched {
   border-color: #D9534F;
   background: #FFF9F9;
@@ -588,9 +610,8 @@
   position: relative;
   border: 2px dashed #D6EEFF;
   border-radius: 12px;
-  padding: 1.4rem;
+  padding: 0.5rem;
   text-align: center;
-  cursor: pointer;
   transition: all 0.25s ease;
   background: #F4FAFF;
   min-height: 120px;
@@ -834,9 +855,8 @@
   border: 2px dashed #B8DCF5;
   border-radius: 14px;
   background: #F4FAFF;
-  padding: 1.2rem;
+  padding: 0.5rem;
   text-align: center;
-  cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;

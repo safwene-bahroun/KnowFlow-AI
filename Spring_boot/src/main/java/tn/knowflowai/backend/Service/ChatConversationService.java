@@ -39,7 +39,7 @@ public class ChatConversationService {
     getByUser(Long userId) {
 
         return repository
-                .findByUserIdOrderByModifiedAtDesc(
+                .findAllByUserId(
                         userId
                 );
     }

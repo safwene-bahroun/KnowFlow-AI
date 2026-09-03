@@ -1,0 +1,23 @@
+<section class="feedback-page">
+  <header class="feedback-header">
+    <div><span class="eyebrow">KnowFlow AI</span><h2>{{ isAdmin ? 'Feedback inbox' : 'Feedback' }}</h2><p>{{ isAdmin ? 'Review feedback submitted by employees and managers.' : 'Help us improve your document assistant.' }}</p></div>
+  </header>
+
+  <form class="feedback-form" (ngSubmit)="submit()" *ngIf="!isAdmin">
+    <div class="feedback-types">
+      <label [class.selected]="type === 'POSITIVE'"><input type="radio" name="type" [(ngModel)]="type" value="POSITIVE"> Helpful</label>
+      <label [class.selected]="type === 'NEGATIVE'"><input type="radio" name="type" [(ngModel)]="type" value="NEGATIVE"> Needs improvement</label>
+    </div>
+    <label for="feedback-comment">Your feedback</label>
+    <textarea id="feedback-comment" name="comment" [(ngModel)]="comment" rows="5" maxlength="2000" placeholder="Tell us what worked or what could be better..."></textarea>
+    <button type="submit" [disabled]="loading || !comment.trim()">{{ loading ? 'Sending...' : 'Send feedback' }}</button>
+    <p class="success" *ngIf="submitted">Thank you. Your feedback was sent to the administrators.</p>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </form>
+
+  <div class="feedback-list" *ngIf="isAdmin && feedbacks.length">
+    <article *ngFor="let feedback of feedbacks"><strong>{{ feedback.type }}</strong><span>{{ feedback.userName }} · {{ feedback.userEmail }}</span><p>{{ feedback.comment }}</p><small>Document: {{ feedback.documentName || 'General feedback' }}</small><small *ngIf="feedback.messageContent">Message: {{ feedback.messageContent }}</small><button type="button" (click)="deleteFeedback(feedback)">Delete</button></article>
+  </div>
+  <p class="empty-state" *ngIf="isAdmin && !loading && !feedbacks.length">No feedback has been submitted yet.</p>
+  <button class="refresh-button" type="button" *ngIf="isAdmin" (click)="loadFeedbacks()" [disabled]="loading">Refresh feedback</button>
+</section>

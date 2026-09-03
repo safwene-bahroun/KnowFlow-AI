@@ -1,3 +1,33 @@
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-heading .primary-btn {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.1rem;
+  border: none;
+  border-radius: 8px;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #0070AD 0%, #4DA8DA 100%);
+  box-shadow: 0 2px 8px rgba(0, 112, 173, 0.2);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.page-heading .primary-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 112, 173, 0.3);
+}
 /* ================================================
    DOCUMENTS PAGE – Capgemini KnowFlow AI Theme
    ================================================

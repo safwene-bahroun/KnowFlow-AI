@@ -61,7 +61,7 @@
       </p>
 
       <div class="hero-actions">
-        <button class="btn btn-hero-primary" onclick="openModal('register')" routerLink="/auth">
+        <button class="btn btn-hero-primary" (click)="startChat()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           Start Chatting Free
         </button>
@@ -132,9 +132,7 @@
             </div>
           </div>
           <div class="chat-msg ai">
-            <div class="chat-msg-avatar">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </div>
+            <div class="chat-msg-avatar"><app-ai-avatar state="success" size="tiny"></app-ai-avatar></div>
             <div class="chat-msg-bubble">
               The KnowFlow AI pipeline uses a <strong>3-stage RAG architecture</strong>: Document Ingestion (chunking + embedding via vector DB), Retrieval (semantic search with hybrid scoring), and Generation (LLM with source-grounded responses). All access is governed by <strong>IAM policies</strong>.
               <div class="source-link">
@@ -150,9 +148,7 @@
             </div>
           </div>
           <div class="chat-msg ai">
-            <div class="chat-msg-avatar">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </div>
+            <div class="chat-msg-avatar"><app-ai-avatar state="success" size="tiny"></app-ai-avatar></div>
             <div class="chat-msg-bubble">
               Found the <strong>IAM Integration Spec v2.1</strong>. Before retrieval, the system resolves the user's role via IAM tokens, then filters the vector search space to only documents the user is authorized to access — ensuring zero data leakage...
             </div>
@@ -494,7 +490,7 @@
         <label for="regPassword">Password</label>
         <div class="input-wrapper">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <input type="password" id="regPassword" placeholder="Min 8 characters">
+          <input type="password" id="regPassword" placeholder="Min 6 characters, upper/lowercase, number, symbol">
         </div>
       </div>
 

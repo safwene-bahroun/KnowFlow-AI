@@ -4,6 +4,7 @@ C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\ba
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Controller\DepartmentController.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Controller\DocumentController.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Controller\EmployeeDocumentController.java
+C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Controller\FeedbackController.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Controller\InternalDocumentController.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Controller\NotificationController.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\Controller\ProfileController.java
@@ -17,11 +18,15 @@ C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\ba
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\Auth\RegistrationOptionsResponse.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\Auth\ResetPasswordRequest.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\Auth\UserResponse.java
+C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\ChatConversationResponse.java
+C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\ChatMessageResponse.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\ChatQuestionRequest.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\ChunkRequest.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\DocumentIngestRequest.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\DocumentRequest.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\DocumentResponse.java
+C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\FeedbackRequest.java
+C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\FeedbackResponse.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\FlaskRagRequest.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\FlaskRagResponse.java
 C:\Users\GIGABYTE\Desktop\KnowFlow_AI\Spring_boot\src\main\java\tn\knowflowai\backend\DTO\NotificationResponse.java

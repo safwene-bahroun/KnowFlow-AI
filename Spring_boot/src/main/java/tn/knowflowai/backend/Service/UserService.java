@@ -44,6 +44,7 @@ public class UserService {
         }
 
         if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            validatePassword(user.getPassword());
             user.setPassword(
                     passwordEncoder.encode(user.getPassword())
             );
@@ -165,6 +166,7 @@ public class UserService {
 
         // Update password if provided
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+            validatePassword(updatedUser.getPassword());
             user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
 
@@ -198,11 +200,21 @@ public class UserService {
 
         User user = getById(id);
 
+        validatePassword(newPassword);
         user.setPassword(
                 passwordEncoder.encode(newPassword)
         );
 
         return userRepository.save(user);
+    }
+
+    private void validatePassword(String password) {
+        if (password.length() < 6 ||
+                !password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).+$")) {
+            throw new IllegalArgumentException(
+                    "Password must contain at least 6 characters, including uppercase, lowercase, number and special character"
+            );
+        }
     }
 
     public User updateProfile(String currentEmail, ProfileRequest request) throws IOException {

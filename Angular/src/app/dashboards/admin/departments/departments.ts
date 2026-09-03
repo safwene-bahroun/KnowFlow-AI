@@ -37,6 +37,7 @@ export class Departments implements OnInit {
   selectedDepartment: Department | null = null;
 
   isEditing = false;
+  showForm = false;
   isLoading = false;
 
   errorMessage = '';
@@ -137,6 +138,11 @@ export class Departments implements OnInit {
       });
   }
 
+  openCreateForm(): void {
+    this.resetForm();
+    this.showForm = true;
+  }
+
   // =========================
   // EDIT
   // =========================
@@ -151,6 +157,7 @@ export class Departments implements OnInit {
 
     this.selectedDepartment = department;
     this.isEditing = true;
+    this.showForm = true;
 
     this.departmentForm.patchValue({
       name: department.name,
@@ -310,6 +317,7 @@ export class Departments implements OnInit {
 
     this.selectedDepartment = null;
     this.isEditing = false;
+    this.showForm = false;
   }
 
   // =========================

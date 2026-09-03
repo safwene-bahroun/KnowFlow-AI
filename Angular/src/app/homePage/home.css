@@ -14,7 +14,10 @@
 }
 
 .chat-logo {
-  height: 20px;
+  width: 100px;
+  height: 100px;
+  margin: 6px;
+  object-fit: contain;
 }
 
 .footer-logo {
@@ -431,11 +434,16 @@
   gap: 10px;
 }
 
+.chat-mockup-header-left app-ai-avatar {
+  flex-shrink: 0;
+}
+
 .chat-mockup-logo {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, var(--blue-primary), var(--cyan));
-  border-radius: 8px;
+  width: 112px;
+  height: 112px;
+  margin: 0;
+  background: transparent;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -533,6 +541,13 @@
 
 .chat-msg.ai .chat-msg-avatar {
   background: linear-gradient(135deg, var(--blue-primary), var(--cyan));
+}
+
+.chat-msg.ai .chat-msg-avatar {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  overflow: visible;
 }
 
 .chat-msg.user .chat-msg-avatar {

@@ -64,6 +64,7 @@ export class Documents implements OnInit, OnDestroy {
   readonly documentVisibilities = Object.values(DocumentVisibility);
 
   isEditing      = false;
+  showForm       = false;
   isLoading      = false;
   errorMessage   = '';
   successMessage = '';
@@ -144,10 +145,12 @@ export class Documents implements OnInit, OnDestroy {
         const id = params.get('id');
         if (mode === 'edit' && id) {
           this.isEditing = true;
+          this.showForm = true;
           this.loadDocument(+id);
         } else {
           this.isEditing = false;
           this.resetForm();
+          this.showForm = mode === 'add';
         }
       });
     });
@@ -434,8 +437,14 @@ export class Documents implements OnInit, OnDestroy {
     });
     this.selectedDocument = null;
     this.isEditing        = false;
+    this.showForm         = false;
     this.clearFile();
     this.onVisibilityChange();
+  }
+
+  openCreateForm(): void {
+    this.resetForm();
+    this.showForm = true;
   }
 
   private clearMessages(): void {

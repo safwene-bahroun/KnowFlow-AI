@@ -6,6 +6,8 @@ import {
 
 import {
   FormBuilder,
+  AbstractControl,
+  ValidationErrors,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
@@ -18,6 +20,12 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { AuthService } from '../../Services/auth-service';
+
+function passwordsMatch(control: AbstractControl): ValidationErrors | null {
+  return control.get('password')?.value === control.get('confirmPassword')?.value
+    ? null
+    : { passwordsMismatch: true };
+}
 
 
 // =====================================================
@@ -87,6 +95,13 @@ export class Registration implements OnInit {
   // ==========================================
 
   currentStep = 1;
+  passwordVisible = false;
+  confirmPasswordVisible = false;
+
+  togglePasswordVisibility(field: 'password' | 'confirmPassword'): void {
+    if (field === 'password') this.passwordVisible = !this.passwordVisible;
+    else this.confirmPasswordVisible = !this.confirmPasswordVisible;
+  }
 
 
   // ==========================================
@@ -146,13 +161,15 @@ export class Registration implements OnInit {
       '',
       [
         Validators.required,
-        Validators.minLength(8),
+        Validators.minLength(6),
         Validators.maxLength(100),
         Validators.pattern(
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/
         )
       ]
     ],
+
+    confirmPassword: ['', Validators.required],
 
     cin: [
       '',
@@ -210,7 +227,7 @@ export class Registration implements OnInit {
       ]
     ]
 
-  });
+  }, { validators: passwordsMatch });
 
 
   // ===================================================
@@ -291,6 +308,13 @@ export class Registration implements OnInit {
 
   }
 
+  isStep2Valid(): boolean {
+    return ['employeeProfile', 'departmentName'].every(key => {
+      const control = this.registerForm.get(key);
+      return control && control.valid;
+    });
+  }
+
 
   // ==========================================
   // STEP NAVIGATION
@@ -298,26 +322,31 @@ export class Registration implements OnInit {
 
   nextStep(): void {
 
-    // Mark step 1 fields as touched to show errors
-    const step1Fields = [
+    const fields = this.currentStep === 1
+      ? [
       'name',
       'familyName',
       'email',
       'cin',
       'age',
       'gender'
-    ];
+    ]
+      : ['employeeProfile', 'departmentName'];
 
-    step1Fields.forEach(key => {
+    fields.forEach(key => {
 
       this.registerForm.get(key)?.markAsTouched();
 
     });
 
 
-    if (this.isStep1Valid()) {
+    const valid = this.currentStep === 1
+      ? this.isStep1Valid()
+      : this.isStep2Valid();
 
-      this.currentStep = 2;
+    if (valid && this.currentStep < 3) {
+
+      this.currentStep++;
 
     }
 

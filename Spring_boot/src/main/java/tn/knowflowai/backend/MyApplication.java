@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import tn.knowflowai.backend.Entity.Enum.EmployeProfile;
 import tn.knowflowai.backend.Entity.Enum.Gender;
@@ -90,6 +91,32 @@ public class MyApplication {
             System.out.println(
                 "=========================================="
             );
+        };
+    }
+
+    @Bean
+    CommandLineRunner updateNotificationTypeConstraint(JdbcTemplate jdbcTemplate) {
+        return args -> {
+            jdbcTemplate.execute("""
+                    DO $$
+                    BEGIN
+                        IF EXISTS (
+                            SELECT 1 FROM pg_constraint
+                            WHERE conname = 'notifications_type_check'
+                        ) THEN
+                            ALTER TABLE notifications DROP CONSTRAINT notifications_type_check;
+                        END IF;
+
+                        ALTER TABLE notifications
+                        ADD CONSTRAINT notifications_type_check
+                        CHECK (type IN (
+                            'DOCUMENT_UPLOADED', 'DOCUMENT_UPDATED',
+                            'DOCUMENT_PROCESSED', 'DOCUMENT_REJECTED',
+                            'FRAUD_DETECTED', 'NEW_MESSAGE',
+                            'FEEDBACK_RECEIVED', 'SYSTEM'
+                        ));
+                    END $$;
+                    """);
         };
     }
 }

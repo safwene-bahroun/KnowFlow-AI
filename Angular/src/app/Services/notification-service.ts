@@ -4,10 +4,12 @@ import { Observable } from 'rxjs';
 
 export type NotificationType =
   | 'DOCUMENT_UPLOADED'
+  | 'DOCUMENT_UPDATED'
   | 'DOCUMENT_PROCESSED'
   | 'DOCUMENT_REJECTED'
   | 'FRAUD_DETECTED'
   | 'NEW_MESSAGE'
+  | 'FEEDBACK_RECEIVED'
   | 'SYSTEM';
 
 export interface AppNotification {

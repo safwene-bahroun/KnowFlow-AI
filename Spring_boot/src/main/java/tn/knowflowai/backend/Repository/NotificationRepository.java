@@ -22,6 +22,11 @@ public interface NotificationRepository
             NotificationType type
     );
 
+    List<Notification> findByRecipientIdAndTypeAndReadFalse(
+            Long userId,
+            NotificationType type
+    );
+
     long countByRecipientIdAndReadFalse(
             Long userId
     );

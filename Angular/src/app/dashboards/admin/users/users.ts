@@ -64,12 +64,15 @@ export class Users implements OnInit {
   imagePreview: string | null = null;
   imageBase64: string | null = null;
   isDragging = false;
+  passwordVisible = false;
+  confirmPasswordVisible = false;
 
   userForm = this.fb.group({
     name: ['', Validators.required],
     familyName: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: [''],
+    confirmPassword: [''],
     cin: [''],
     phoneNumber: [''],
     address: [''],
@@ -82,6 +85,11 @@ export class Users implements OnInit {
     createdAt: [{ value: null as string | null, disabled: true }],
     modifiedAt: [{ value: null as string | null, disabled: true }]
   });
+
+  togglePasswordVisibility(field: 'password' | 'confirmPassword'): void {
+    if (field === 'password') this.passwordVisible = !this.passwordVisible;
+    else this.confirmPasswordVisible = !this.confirmPasswordVisible;
+  }
 
   ngOnInit(): void {
     const routeMode = this.route.snapshot.data['mode'] as 'list' | 'add' | 'edit' | undefined;
@@ -281,7 +289,12 @@ export class Users implements OnInit {
     this.imagePreview = null;
     this.imageBase64 = null;
 
-    this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
+    this.userForm.get('password')?.setValidators([
+      Validators.required,
+      Validators.minLength(6),
+      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/)
+    ]);
+    this.userForm.get('confirmPassword')?.setValidators([Validators.required]);
     this.userForm.get('password')?.updateValueAndValidity();
   }
 
@@ -317,7 +330,9 @@ export class Users implements OnInit {
         }
 
         this.userForm.get('password')?.clearValidators();
+        this.userForm.get('confirmPassword')?.clearValidators();
         this.userForm.get('password')?.updateValueAndValidity();
+          this.userForm.get('confirmPassword')?.updateValueAndValidity();
         this.loadingUser = false;
         this.changeDetector.markForCheck();
       },
@@ -331,6 +346,12 @@ export class Users implements OnInit {
   }
 
   saveUser(): void {
+    const password = this.userForm.get('password')?.value || '';
+    const confirmation = this.userForm.get('confirmPassword')?.value || '';
+    if (password && password !== confirmation) {
+      this.errorMessage = 'Passwords do not match.';
+      return;
+    }
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
       return;
@@ -428,4 +449,4 @@ export class Users implements OnInit {
     this.selectedRole = '';
     this.loadUsers();
   }
-}
+}

@@ -34,6 +34,7 @@ import tn.knowflowai.backend.Repository.UserRepository;
 import tn.knowflowai.backend.Service.DocumentService;
 import tn.knowflowai.backend.Service.FileStorageService;
 import tn.knowflowai.backend.Service.FlaskRagClient;
+import tn.knowflowai.backend.Service.NotificationService;
 
 @RestController
 @RequestMapping("/api/admin/documents")
@@ -47,6 +48,7 @@ public class DocumentController {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
     private final FlaskRagClient flaskRagClient;
+    private final NotificationService notificationService;
 
     public DocumentController(
             DocumentService documentService,
@@ -54,7 +56,8 @@ public class DocumentController {
             DepartmentRepository departmentRepository,
             UserRepository userRepository,
             FileStorageService fileStorageService,
-            FlaskRagClient flaskRagClient
+            FlaskRagClient flaskRagClient,
+            NotificationService notificationService
     ) {
         this.documentService = documentService;
         this.documentRepository = documentRepository;
@@ -62,6 +65,7 @@ public class DocumentController {
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
         this.flaskRagClient = flaskRagClient;
+        this.notificationService = notificationService;
     }
 
     // ==========================================
@@ -89,6 +93,7 @@ public class DocumentController {
         normalizeVisibility(document);
 
         Document saved = documentRepository.save(document);
+        notificationService.notifyDocumentChange(saved, false);
 
         // Asynchronously trigger Flask RAG ingestion
         triggerFlaskIngestion(saved);
@@ -192,6 +197,7 @@ public class DocumentController {
         }
 
         Document saved = documentRepository.save(document);
+        notificationService.notifyDocumentChange(saved, true);
 
         // Always re-ingest to keep Chroma vectors in sync with latest metadata/file
         // Flask ingestion service deletes old vectors and re-adds, so this is safe

@@ -187,6 +187,11 @@ export const routes: Routes = [
         component: Notifications
       },
 
+      {
+        path: 'feedback',
+        loadComponent: () => import('./shared/feedback/feedback').then(m => m.Feedback)
+      },
+
 
       // DEFAULT ADMIN
 
@@ -270,6 +275,11 @@ export const routes: Routes = [
           .then(m => m.Notifications)
     },
 
+      {
+        path: 'feedback',
+        loadComponent: () => import('./shared/feedback/feedback').then(m => m.Feedback)
+      },
+
 
     // --------------------------------------
     // PROFILE SETTINGS
@@ -341,6 +351,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./dashboards/employee/notifications/notifications')
             .then(m => m.Notifications)
+      },
+
+      {
+        path: 'feedback',
+        loadComponent: () => import('./shared/feedback/feedback').then(m => m.Feedback)
       },
 
 

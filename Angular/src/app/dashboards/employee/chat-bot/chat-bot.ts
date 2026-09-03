@@ -24,6 +24,7 @@ import {
   AuthService,
   UserResponse
 } from '../../../Services/auth-service';
+import { AiAvatar, AiAvatarState } from '../../../shared/ai-avatar/ai-avatar';
 
 
 @Component({
@@ -31,12 +32,17 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    AiAvatar
   ],
   templateUrl: './chat-bot.html',
   styleUrl: './chat-bot.css'
 })
 export class ChatBot implements OnInit, OnDestroy {
+  get avatarState(): AiAvatarState {
+    if (this.showTyping) return 'processing';
+    return this.messages.length ? 'success' : 'idle';
+  }
 
 
   // ==========================================
@@ -49,6 +55,9 @@ export class ChatBot implements OnInit, OnDestroy {
   // CONVERSATIONS
   // ==========================================
   conversations: ChatConversation[] = [];
+  historyOpen = false;
+  conversationsLoading = false;
+  conversationsError = '';
 
 
   // ==========================================
@@ -123,15 +132,20 @@ export class ChatBot implements OnInit, OnDestroy {
   // LOAD CONVERSATIONS
   // ==========================================
   loadConversations(): void {
+    this.conversationsLoading = true;
+    this.conversationsError = '';
     this.chatBotService
       .getConversations()
       .subscribe({
         next: (conversations) => {
           this.conversations = conversations;
+          this.conversationsLoading = false;
           this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error loading conversations', error);
+          this.conversationsLoading = false;
+          this.conversationsError = 'Unable to load conversations.';
           this.cdr.markForCheck();
         }
       });
@@ -147,6 +161,13 @@ export class ChatBot implements OnInit, OnDestroy {
     this.question = '';
     this.errorMessage = '';
     this.showTyping = false;
+  }
+
+  toggleHistory(): void {
+    this.historyOpen = !this.historyOpen;
+    if (this.historyOpen) {
+      this.loadConversations();
+    }
   }
 
 

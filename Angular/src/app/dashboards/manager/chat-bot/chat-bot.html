@@ -1,16 +1,47 @@
-<div class="chat-layout">
+<div class="chat-layout" [class.history-open]="historyOpen">
+  <aside class="history-panel" *ngIf="historyOpen">
+    <div class="history-panel-header">
+      <div>
+        <span class="history-eyebrow">Your conversations</span>
+        <h3>History</h3>
+      </div>
+      <button type="button" class="icon-button" (click)="toggleHistory()" aria-label="Close history" title="Close history">&times;</button>
+    </div>
+    <div class="history-state" *ngIf="conversationsLoading">Loading conversations...</div>
+    <div class="history-state error" *ngIf="!conversationsLoading && conversationsError">{{ conversationsError }} <button type="button" (click)="loadConversations()">Retry</button></div>
+    <div class="history-state" *ngIf="!conversationsLoading && !conversationsError && !conversations.length">No conversations yet.</div>
+    <div class="conversation-list">
+      <div class="conversation-item" *ngFor="let conversation of conversations" [class.active]="conversation.id === conversationId" (click)="selectConversation(conversation)">
+        <button type="button" class="conversation-select" (click)="$event.stopPropagation(); selectConversation(conversation)">
+          <span class="conversation-icon">&#9679;</span>
+          <span class="conversation-title">{{ conversation.title }}</span>
+        </button>
+        <button type="button" class="delete-button" (click)="deleteConversation(conversation, $event)" aria-label="Delete conversation" title="Delete conversation">&#128465;</button>
+      </div>
+    </div>
+  </aside>
   <!-- CHAT AREA -->
   <div class="chat-container">
 
     <!-- HEADER -->
     <div class="chat-header">
       <div class="chat-title">
-        <div class="bot-icon">🤖</div>
+        <app-ai-avatar [state]="avatarState" size="medium"></app-ai-avatar>
         <div>
           <h2>KnowFlow AI</h2>
           <span>AI Document Assistant</span>
         </div>
       </div>
+      <button
+        type="button"
+        class="history-btn"
+        (click)="toggleHistory()"
+        [attr.aria-expanded]="historyOpen"
+        aria-label="Open conversation history"
+        title="Conversation history"
+      >
+        &#9776; History
+      </button>
       <button
         type="button"
         class="new-chat-btn"
@@ -32,7 +63,7 @@
         class="welcome"
         *ngIf="messages.length === 0 && !loading"
       >
-        <div class="welcome-icon">🤖</div>
+        <app-ai-avatar [state]="avatarState" size="large"></app-ai-avatar>
         <h2>How can I help you?</h2>
         <p>Ask questions about documents you are authorized to access.</p>
 
@@ -67,15 +98,16 @@
 
       <!-- Chat Messages -->
       <div
-        class="message-row user-message"
+        class="message-row"
         *ngFor="let message of messages; let i = index"
+        [class.user-message]="message.role === 'USER'"
         [class.assistant-message]="message.role === 'AI'"
       >
         <!-- AI Avatar -->
         <div
           class="message-avatar ai-avatar"
           *ngIf="message.role === 'AI'"
-        >AI</div>
+        ><app-ai-avatar [state]="avatarState" size="small"></app-ai-avatar></div>
 
         <!-- Bubble -->
         <div class="message-bubble">
@@ -108,7 +140,7 @@
         class="typing-row assistant-message"
         *ngIf="showTyping"
       >
-        <div class="message-avatar">🤖</div>
+        <div class="message-avatar"><app-ai-avatar state="processing" size="small"></app-ai-avatar></div>
         <div class="typing-bubble">
           <div class="typing-dots">
             <span></span>

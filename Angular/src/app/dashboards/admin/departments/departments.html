@@ -1,6 +1,9 @@
 <div class="department-container">
 
-  <h2>Departments</h2>
+  <div class="page-heading">
+    <h2>Departments</h2>
+    <button type="button" class="primary-btn" (click)="openCreateForm()">+ Add Department</button>
+  </div>
 
   <!-- Messages -->
 
@@ -53,7 +56,7 @@
   <!-- FORM -->
   <!-- ========================= -->
 
-  <div class="department-form">
+  <div class="department-form" *ngIf="showForm">
 
     <h3>
       {{ isEditing

@@ -1,5 +1,6 @@
 import {
   Component,
+  ChangeDetectorRef,
   OnInit
 } from '@angular/core';
 
@@ -46,6 +47,7 @@ export class Admin implements OnInit {
     private authService: AuthService,
     private router: Router,
     private notificationService: NotificationService
+      , private changeDetector: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -60,8 +62,8 @@ export class Admin implements OnInit {
 
   loadUnreadNotifications(): void {
     this.notificationService.getUnreadCount().subscribe({
-      next: count => this.unreadNotifications = count,
-      error: () => this.unreadNotifications = 0
+      next: count => { this.unreadNotifications = count; this.changeDetector.markForCheck(); },
+      error: () => { this.unreadNotifications = 0; this.changeDetector.markForCheck(); }
     });
   }
 

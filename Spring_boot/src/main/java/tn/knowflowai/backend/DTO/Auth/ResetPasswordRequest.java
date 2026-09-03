@@ -2,6 +2,7 @@ package tn.knowflowai.backend.DTO.Auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 
 public class ResetPasswordRequest {
 
@@ -10,8 +11,12 @@ public class ResetPasswordRequest {
 
     @NotBlank
     @Size(
-        min = 8,
-        message = "Password must contain at least 8 characters"
+        min = 6,
+        message = "Password must contain at least 6 characters"
+    )
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).+$",
+        message = "Password must contain uppercase, lowercase, number and special character"
     )
     private String newPassword;
 

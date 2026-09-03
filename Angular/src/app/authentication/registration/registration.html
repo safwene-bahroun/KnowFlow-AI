@@ -1,7 +1,7 @@
 <div class="auth-container">
 
   <div class="back-btn-wrapper">
-    <button routerLink="/Home"><-- Back to Home</button>
+<button routerLink="/Home">❮❮❮❮  Back </button>
   </div>
 
   <div class="auth-card">
@@ -37,9 +37,23 @@
       <div
         class="step"
         [class.active]="currentStep === 2"
+        [class.completed]="currentStep > 2"
       >
         <span class="step-num">2</span>
         <span class="step-label">Professional</span>
+      </div>
+
+      <div
+        class="step-line"
+        [class.active]="currentStep > 2"
+      ></div>
+
+      <div
+        class="step"
+        [class.active]="currentStep === 3"
+      >
+        <span class="step-num">3</span>
+        <span class="step-label">Security</span>
       </div>
 
     </div>
@@ -319,10 +333,42 @@
         </div>
 
 
-        <!-- PROFILE IMAGE (Drag & Drop) -->
+      </div>
+
+      <!-- STEP 3 : SECURITY AND PROFILE -->
+      <div
+        class="step-content"
+        [class.hidden]="currentStep !== 3"
+      >
+        <div class="form-group">
+          <label>Password</label>
+          <div class="password-field">
+          <input
+            [type]="passwordVisible ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Min 6 characters, upper/lowercase, number, symbol"
+          >
+          <button type="button" class="password-toggle" (click)="togglePasswordVisibility('password')">{{ passwordVisible ? 'Hide' : 'Show' }}</button>
+          </div>
+          <small
+            class="error"
+            *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid"
+          >
+            Minimum 6 characters with uppercase, lowercase, number and special character.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm password</label>
+          <div class="password-field">
+            <input [type]="confirmPasswordVisible ? 'text' : 'password'" formControlName="confirmPassword" placeholder="Repeat your password">
+            <button type="button" class="password-toggle" (click)="togglePasswordVisibility('confirmPassword')">{{ confirmPasswordVisible ? 'Hide' : 'Show' }}</button>
+          </div>
+          <small class="error" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.hasError('passwordsMismatch')">Passwords do not match.</small>
+        </div>
+
         <div class="form-group">
           <label>Profile Image</label>
-
           <div
             class="file-dropzone"
             [class.has-file]="imagePreview"
@@ -339,29 +385,9 @@
               class="file-input-hidden"
               (change)="onFileSelected($event)"
             >
-
-            <!-- Preview -->
-            <img
-              *ngIf="imagePreview"
-              [src]="imagePreview"
-              class="image-preview"
-              alt="Preview"
-            >
-
-            <!-- Placeholder -->
-            <div
-              *ngIf="!imagePreview"
-              class="dropzone-placeholder"
-            >
-              <svg
-                class="upload-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+            <img *ngIf="imagePreview" [src]="imagePreview" class="image-preview" alt="Preview">
+            <div *ngIf="!imagePreview" class="dropzone-placeholder">
+              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
@@ -369,45 +395,9 @@
               <span>Drag & drop photo or click to browse</span>
               <span class="dropzone-hint">PNG, JPG or WEBP (Max 5MB)</span>
             </div>
-
-            <!-- Remove button -->
-            <button
-              *ngIf="imagePreview"
-              type="button"
-              class="remove-image-btn"
-              (click)="removeImage($event)"
-            >
-              &#10005;
-            </button>
+            <button *ngIf="imagePreview" type="button" class="remove-image-btn" (click)="removeImage($event)">&#10005;</button>
           </div>
         </div>
-
-
-
-        <!-- PASSWORD -->
-
-        <div class="form-group">
-
-          <label>Password</label>
-
-          <input
-            type="password"
-            formControlName="password"
-            placeholder="Create a strong password"
-          >
-
-          <small
-            class="error"
-            *ngIf="
-              registerForm.get('password')?.touched &&
-              registerForm.get('password')?.invalid
-            "
-          >
-            Min 8 chars, uppercase, lowercase, number & special character.
-          </small>
-
-        </div>
-
       </div>
 
 
@@ -437,7 +427,7 @@
 
         <!-- Previous -->
         <button
-          *ngIf="currentStep === 2"
+          *ngIf="currentStep > 1"
           type="button"
           class="btn-prev"
           (click)="prevStep()"
@@ -448,18 +438,18 @@
 
         <!-- Next (Step 1) -->
         <button
-          *ngIf="currentStep === 1"
+          *ngIf="currentStep < 3"
           type="button"
           class="btn-next"
           (click)="nextStep()"
-          [disabled]="!isStep1Valid()"
+          [disabled]="currentStep === 1 ? !isStep1Valid() : !isStep2Valid()"
         >
           Next
         </button>
 
         <!-- Submit (Step 2) -->
         <button
-          *ngIf="currentStep === 2"
+          *ngIf="currentStep === 3"
           type="submit"
           [disabled]="registerForm.invalid || loading"
         >

@@ -29,15 +29,6 @@
         <span class="label">ChatBot</span>
       </a>
 
-          <a
-        routerLink="/manager/history/conversations"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: false }"
-      >
-        <span class="icon">⏳</span>
-        <span class="label">History</span>
-      </a>
-
          <a
         routerLink="/manager/log"
         routerLinkActive="active"
@@ -54,6 +45,10 @@
       >
         <span class="icon">🔔</span>
         <span class="label">Notifications</span>
+      </a>
+      <a routerLink="/manager/feedback" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="icon">💬</span>
+        <span class="label">Feedback</span>
       </a>
 
     </nav>

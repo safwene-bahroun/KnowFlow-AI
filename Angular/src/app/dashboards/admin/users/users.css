@@ -45,6 +45,12 @@
   gap: 1rem;
 }
 
+.page-header .primary-btn {
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
 .page-header h2 {
   font-size: 1.5rem;
   font-weight: 700;
